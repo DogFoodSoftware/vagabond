@@ -1,0 +1,15 @@
+Meta-Configuration
+
+Meta-configuration describes the conceptual environment setup. 'Requires a
+static IP' is a common meta-configuration for many hosts in a production
+environment.
+
+
+Configuration
+
+Configuration is done by consuming the meta-configuration, analyzing the
+environment context, and possibly interacting with an external operator to
+nail down the specifics necessary for creating a runnable environment. E.g.,
+if the meta-configuration requires a static IP address, the configuration
+process will determine the actual IP address to use and generate configuration
+files specifying the address.
