@@ -6,7 +6,9 @@
     purposes. The <a href="/documentation/vagabond/Project_Summary">Vagabond
     project summary page</a> details a number of
     typical <a href="/documentation/vagabond/Project_Summary#Common-Use-Cases">common
-    use cases</a>.
+    use cases</a>. You may also want to review
+    the <a href="/documentation/vagabond/Primer#Terminology">terminology section in the
+    Vagabond Primer</a>.
   </div>
 </div>
 <div id="Supported-Operating-Systems" class="grid_12 blurbSummary">
@@ -14,37 +16,12 @@
   <div class="p">
     At this time, we support all versions of Mac and Linux which support
     recent versions of Vagrant (1.2+), VirtualBox (4.1+), and git (1.7+,
-    though earlier probably good too). As far as we know, everything should
-    work on Windows as well, but we don't use windows ourselves and have no
-    plans to test Windows setups ourselves until we are further down the road
-    in product development. We'd love to add any information on Windows, or
-    get confirmation that specific version combinations work.
+    though earlier probably good too). In theroy everything should work on
+    Windows though we are not currently testing this
+    ourselves.<span class="note">Windows support will be included in 1.0. In
+    the meantime, any feedback would be appreciated.</span>
   </div>
 </div><!-- .blurbSummary#Supported-Operating-Systems -->
-<div id="Terminology" class="grid_12 blurbSummary">
-  <div class="blurbTitle">Terminology</div>
-  <div class="p">
-    A quick rundown on terminology. A <em>virtual machine</em> is a computer
-    just like any other except that instead of a physical box, it runs inside
-    another computer. The physical computer is called the <em>host</em> and
-    the virtual machine is called the <em>guest</em>.
-  </div>
-  <div class="p">
-    The host uses a <em>virtualizer</em>, like VirtualBox, to run the host
-    machine. The virtualizer emulates real hardware so as far as the guest is
-    concerned, it's running an real hardware like any other computer.
-  </div>
-  <div class="p">
-    Vagrant is a application which is used to manage and configure
-    guests. Vagrant calls the guests it creates <em>vagrants</em>. Vagabond
-    pre-packages Vagrant configurations and setups for specific purposes, like
-    a web server or a development workstation. Vagabond generally deals
-    with <em>environments</em> which consist of one or more guests. For
-    instance, a particular environment may set up a separate web server and
-    database server packaged in a single Vagabond
-    environment.
-  </div>
-</div>
 <div id="Prerequisites" class="grid_12 blurbSummary">
   <div class="blurbTitle">Prerequisites</div>
   <div class="p">
@@ -52,9 +29,8 @@
     software: 
     <a href="www.virtualbox.org">Virtual Box</a>,
     <a href="www.vagrantup.com">Vagrant</a>,
-    and <a href="http://git-scm.com/">git</a>. If you already have one or both
-    installed, it's might be a good idea to go ahead and update to at least
-    the versions quoted below.
+    and <a href="http://git-scm.com/">git</a>. If already installed, please
+    check the versions are reasonable up to date with those quoted below.
   </div>
   <div class="subHeader"><span>Vagrant</span></div>
   <div class="p">
@@ -75,17 +51,9 @@
     part of the distro. We have used 4.1.x and 4.2.x.
   </div>
   <div class="p">
-    One note with VirtualBox: the 'guest additions', which are installed on
-    the guest, allow the guest and host to share files and perform other
-    tricks. Every version of the VirtualBox application is paired with a
-    specific version of guest additions and you'll probably see a warning
-    about the versions not matching. In practice, the guest additions are
-    compatible enough and everything should work fine. We do intend to
-    automate the update of guest additions in the
-    future.<span class="note">There was a <a href="
-    http://blog.csanchez.org/2012/05/03/automatically-download-and-install-virtualbox-guest-additions-in-vagrant/">plugin</a>
-    for Vagrant v1, and in theory the process should be relatively easy to
-    automate with a shell script. It's on the TODO list.</span>
+    It shouldn't cause any problems, but you may want to take a look at the
+    <a href="#VirtualBox-Guest-Additions">VirtualBox guest additions</a> note
+    below in the <a href="#Troubleshooting">troubleshooting section</a>.
   </div>
   <div class="subHeader"><span>git</span></div>
   <div class="p">
@@ -113,3 +81,20 @@
     To install Vagabond, you simply clone the 
   </div>
 </div><!-- .blurbSummary#Installing-Vagabond -->
+<div id="Troubleshooting" class="blurbSummary grid_12">
+  <div class="blurbTitle">Troubleshooting</div>
+  <div id="VirtualBox-Guest-Additions"><span>VirtualBox Guest Additions</span></div>
+  <div class="p">
+    One note with VirtualBox: the 'guest additions', which are installed on
+    the guest, allow the guest and host to share files and perform other
+    tricks. Every version of the VirtualBox application is paired with a
+    specific version of guest additions and you'll probably see a warning
+    about the versions not matching. In practice, the guest additions are
+    compatible enough and everything should work fine. We do intend to
+    automate the update of guest additions in the
+    future.<span class="note">There was a <a href="
+    http://blog.csanchez.org/2012/05/03/automatically-download-and-install-virtualbox-guest-additions-in-vagrant/">plugin</a>
+    for Vagrant v1, and in theory the process should be relatively easy to
+    automate with a shell script. It's on the TODO list.</span>
+  </div>
+</div><!-- .blurbSummary#grid_12 -->

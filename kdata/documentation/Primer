@@ -1,19 +1,49 @@
-Meta-Configuration
-
-Meta-configuration describes the conceptual environment setup. 'Requires a
-static IP' is a common meta-configuration for many hosts in a production
-environment.
-
-Configuration is done with a Vagabondfile in the environment.
-
-
-Configuration
-
-Configuration is done by consuming the meta-configuration, analyzing the
-environment context, and possibly interacting with an external operator to
-nail down the specifics necessary for creating a runnable environment. E.g.,
-if the meta-configuration requires a static IP address, the configuration
-process will determine the actual IP address to use and generate configuration
-files specifying the address.
-
-Configuration is accomplished with a Vagrantfile in the environment.
+<div id="Terminology" class="grid_12 blurbSummary">
+  <div class="blurbTitle">Terminology</div>
+  <div class="p">
+    A quick rundown on terminology. A <em>virtual machine</em> is a computer
+    just like any other except that instead of a physical box, it runs inside
+    another computer. The physical computer is called the <em>host</em> and
+    the virtual machine is called the <em>guest</em>.
+  </div>
+  <div class="p">
+    The host uses a <em>virtualizer</em>, like VirtualBox, to run the host
+    machine. The virtualizer emulates real hardware so as far as the guest is
+    concerned, it's running an real hardware like any other computer.
+  </div>
+  <div class="p">
+    Vagrant is a application which is used to manage and configure
+    guests. Vagrant calls the guests it creates <em>vagrants</em>. Vagabond
+    pre-packages Vagrant configurations and setups for specific purposes, like
+    a web server or a development workstation. Vagabond generally deals
+    with <em>environments</em> which consist of one or more guests. For
+    instance, a particular environment may set up a separate web server and
+    database server packaged in a single Vagabond
+    environment.
+  </div>
+</div><!-- .blurbSummary#Terminology -->
+<div id="How-Vagabond-Works" class="blurbSummary grid_12">
+  <div class="blurbTitle">How Vagabond Works</div>
+  <div class="p">
+    <span style="color: red">Be aware:</span> This section of documentation is
+    ahead of current implementation. We do not yet
+    use <code>Vagabondfile</code> as described here.
+  </div>
+  <div class="subHeader"><span>Meta-Configuration</span></div>
+  <div class="p">
+    Meta-configuration describes the conceptual environment setup. 'Requires a
+    static IP' is a common meta-configuration for many hosts in a production
+    environment. Meta-configuration is described by
+    the <code>Vagabondfile</code>.
+  </div>
+  <div class="subHeader"><span>Configuration</span></div>
+  <div class="p">
+    Configuration is done by consuming the meta-configuration, analyzing the
+    environment context, and possibly interacting with an external operator to
+    nail down the specifics necessary for creating a runnable
+    environment. E.g., if the meta-configuration requires a static IP address,
+    the configuration process will determine the actual IP address to use and
+    generate configuration files specifying the address. Configuration is
+    encoded in <code>Vagrantfile</code>s.
+  </div>
+</div><!-- .blurbSummary#How-Vagabond-Works -->
