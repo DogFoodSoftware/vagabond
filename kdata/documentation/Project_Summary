@@ -1,0 +1,6 @@
+<div class="grid_12 blurbSummary">
+  <div class="p">
+    Vagabond uses <a href="www.vagrantup.com">Vagrant</a>
+    and <a href="www.virtualbox.org">Virtual Box</a>.
+  </div>
+</div>

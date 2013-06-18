@@ -1,0 +1,115 @@
+<div class="grid_12 blurbSummary">
+  <div class="p">
+    Vagbond is a quick way to set up virtual environments composed of one or
+    more virtual machines. The idea is to enable users to quickly set up
+    sandboxed environments for development and production
+    purposes. The <a href="/documentation/vagabond/Project_Summary">Vagabond
+    project summary page</a> details a number of
+    typical <a href="/documentation/vagabond/Project_Summary#Common-Use-Cases">common
+    use cases</a>.
+  </div>
+</div>
+<div id="Supported-Operating-Systems" class="grid_12 blurbSummary">
+  <div class="blurbTitle">Supported Operating Systems</div>
+  <div class="p">
+    At this time, we support all versions of Mac and Linux which support
+    recent versions of Vagrant (1.2+), VirtualBox (4.1+), and git (1.7+,
+    though earlier probably good too). As far as we know, everything should
+    work on Windows as well, but we don't use windows ourselves and have no
+    plans to test Windows setups ourselves until we are further down the road
+    in product development. We'd love to add any information on Windows, or
+    get confirmation that specific version combinations work.
+  </div>
+</div><!-- .blurbSummary#Supported-Operating-Systems -->
+<div id="Terminology" class="grid_12 blurbSummary">
+  <div class="blurbTitle">Terminology</div>
+  <div class="p">
+    A quick rundown on terminology. A <em>virtual machine</em> is a computer
+    just like any other except that instead of a physical box, it runs inside
+    another computer. The physical computer is called the <em>host</em> and
+    the virtual machine is called the <em>guest</em>.
+  </div>
+  <div class="p">
+    The host uses a <em>virtualizer</em>, like VirtualBox, to run the host
+    machine. The virtualizer emulates real hardware so as far as the guest is
+    concerned, it's running an real hardware like any other computer.
+  </div>
+  <div class="p">
+    Vagrant is a application which is used to manage and configure
+    guests. Vagrant calls the guests it creates <em>vagrants</em>. Vagabond
+    pre-packages Vagrant configurations and setups for specific purposes, like
+    a web server or a development workstation. Vagabond generally deals
+    with <em>environments</em> which consist of one or more guests. For
+    instance, a particular environment may set up a separate web server and
+    database server packaged in a single Vagabond
+    environment.
+  </div>
+</div>
+<div id="Prerequisites" class="grid_12 blurbSummary">
+  <div class="blurbTitle">Prerequisites</div>
+  <div class="p">
+    Before jumping into Vagabond proper, you will need to set up three pieces of
+    software: 
+    <a href="www.virtualbox.org">Virtual Box</a>,
+    <a href="www.vagrantup.com">Vagrant</a>,
+    and <a href="http://git-scm.com/">git</a>. If you already have one or both
+    installed, it's might be a good idea to go ahead and update to at least
+    the versions quoted below.
+  </div>
+  <div class="subHeader"><span>Vagrant</span></div>
+  <div class="p">
+    At the time of writing, the latest version of Vagrant was 1.2.2 (the 1.2.x
+    series is also referrevd to as 'version 2'), but you should start with the
+    latest available version, which you
+    can <a href="http://downloads.vagrantup.com/">download here</a>. After
+    selecting the version, select the installer for your particular operating
+    system. Linux users may want to check if Vagrant comes pre-packaged with
+    their distribution.
+  </div>
+  <div class="subHeader"><span>VirtualBox</span></div>
+  <div class="p">
+    Same goes for VirtualBox, which you
+    can <a href="https://www.virtualbox.org/wiki/Downloads">download
+    here</a>. Download the latest available version for your operating system,
+    and again, Linux users will want to check if VirtualBox is available as
+    part of the distro. We have used 4.1.x and 4.2.x.
+  </div>
+  <div class="p">
+    One note with VirtualBox: the 'guest additions', which are installed on
+    the guest, allow the guest and host to share files and perform other
+    tricks. Every version of the VirtualBox application is paired with a
+    specific version of guest additions and you'll probably see a warning
+    about the versions not matching. In practice, the guest additions are
+    compatible enough and everything should work fine. We do intend to
+    automate the update of guest additions in the
+    future.<span class="note">There was a <a href="
+    http://blog.csanchez.org/2012/05/03/automatically-download-and-install-virtualbox-guest-additions-in-vagrant/">plugin</a>
+    for Vagrant v1, and in theory the process should be relatively easy to
+    automate with a shell script. It's on the TODO list.</span>
+  </div>
+  <div class="subHeader"><span>git</span></div>
+  <div class="p">
+    As far as we're concerned at this point, git is used to install and update
+    Vagabond. <span data-perspective="detailed">Git is more broadly a piece of
+    software used to track and distribute code changes. Because Vagabond is
+    relatively simple, it's really only necessary to get a copy of the latest
+    configuration scripts, and that's what git does. </span> Almost all Linux
+    users should find git in their distro. Mac and Windows users
+    can <a href="http://git-scm.com/download">download the git
+    installer</a>. Mac users may also consider
+    the <a href="https://help.github.com/articels/set-up-git">GitHub GUI</a>,
+    which will also install the basic git tools.<span class="note">One note:
+    the GitHub GUI may want to install the command line tools in a different
+    location than the git installer from <code>git-scm.com</code>. This
+    doesn't seem to cause any issues in our own testing, though it's not
+    ideal. So, if you think you might use the GitHub GUI, we recommend you let
+    it install the command line tools and avoid installing
+    from <code>git-scm.com</code>.</span>
+  </div>
+</div><!-- .blurbSummary#Prerequisites -->
+<div id="Installing-Vagabond" class="blurbSummary grid_12">
+  <div class="blurbTitle">Installing Vagabond</div>
+  <div class="p">
+    To install Vagabond, you simply clone the 
+  </div>
+</div><!-- .blurbSummary#Installing-Vagabond -->
