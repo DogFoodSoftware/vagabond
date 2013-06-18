@@ -34,21 +34,17 @@
   </div>
   <div class="subHeader"><span>Vagrant</span></div>
   <div class="p">
-    At the time of writing, the latest version of Vagrant was 1.2.2 (the 1.2.x
-    series is also referrevd to as 'version 2'), but you should start with the
-    latest available version, which you
-    can <a href="http://downloads.vagrantup.com/">download here</a>. After
-    selecting the version, select the installer for your particular operating
-    system. Linux users may want to check if Vagrant comes pre-packaged with
-    their distribution.
+    <a href="http://downloads.vagrantup.com/">Download</a> the latest version
+    of Vagrant for your operating system. We tested against 1.2.2 on Mac and Linux. FYI: the Vagrant
+    docs sometimes refer to the 1.2.x series as 'version 2'. Linux users
+    should check if their distro provides a package from the 1.2.x series.
   </div>
   <div class="subHeader"><span>VirtualBox</span></div>
   <div class="p">
-    Same goes for VirtualBox, which you
-    can <a href="https://www.virtualbox.org/wiki/Downloads">download
-    here</a>. Download the latest available version for your operating system,
-    and again, Linux users will want to check if VirtualBox is available as
-    part of the distro. We have used 4.1.x and 4.2.x.
+    <a href="https://www.virtualbox.org/wiki/Downloads">Download</a> the
+    latest version of VirtualBox for your operating system. A relatively
+    recent version is probably available to Linux users via their distro
+    package manager. We have used 4.1.x and 4.2.x.
   </div>
   <div class="p">
     It shouldn't cause any problems, but you may want to take a look at the
@@ -83,7 +79,7 @@
 </div><!-- .blurbSummary#Installing-Vagabond -->
 <div id="Troubleshooting" class="blurbSummary grid_12">
   <div class="blurbTitle">Troubleshooting</div>
-  <div id="VirtualBox-Guest-Additions"><span>VirtualBox Guest Additions</span></div>
+  <div id="VirtualBox-Guest-Additions" class="subHeader"><span>VirtualBox Guest Additions</span></div>
   <div class="p">
     One note with VirtualBox: the 'guest additions', which are installed on
     the guest, allow the guest and host to share files and perform other
