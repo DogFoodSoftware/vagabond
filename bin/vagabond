@@ -52,10 +52,47 @@
 # * create each running virtual machine instance.</li>
 # * </ul>
 # * </div>
-# * <div class="subHeader"><span><code>vagabond-boxes</code></span></div>
+# * <div class="subHeader"><span><code>vagabond-templates</code></span></div>
 # * <div class="p">
+# * Each <code>vagabond-templates</code> item is composed of a set of
+# * one or more <code>Vagabondfile</code>s and 0+ artifact files. Each
+# * <code>Vagabondfile</code> and associated artificats are used to
+# * create usable configurations within a
+# * <code>vagrant-environments</code> item.
+# * </div>
+# * <div class="p">
+# * Each environment template describes a single environment
+# * type.<span data-perspective="coding"> The environment type is
+# * analogous to an object class or object tempalte; the environment
+# * instance corresponding with an object instance.</span> There is no
+# * hard and fast rule how environments are to releate to running
+# * machines. You could, for instance, use single environment for each
+# * machine, or you could organize environmnts by department or other
+# * high level abstraction, or use a single environment for your
+# * entire operation. In practice we recommend most users refer to the
+# * <a
+# * href="/documentation/vagabon/ref/Environment-Design-Guidelines">Vagabond
+# * Environment Design Guidelines</a>.
+# * </div>
+# * <div class="p">
+# * Within an environment, machine-type templates may be organized
+# * under any number of groupings (laid out on disk as
+# * directories). Each directory may exclusively contain one or more
+# * directories or a machine template file set. The environment root
+# * directory may only contain directories.
+# * </div>
+# * <div class="p">
+# * Templates are stored in a seperate directory as <a
+# * href="/documentation/kibbles/lexicon/Static_Data">static data</a>.
+# * Currently, Vagabond only supports the standard templates
+# * distributed with the Vagabond distribution. The 1.0-GA release
+# * will support loadable templates, allowing Vagabond to integrate
+# * and be integrated with other projects.
+#* </div>
 
-# * Each <code>
+# * <div class="subHeader"><span><code>vagabond-environments</code></span></div>
+
+# * <div class="subHeader"><span><code>vagabond-boxes</code></span></div>
 
 # * </div>
 # * </div><!-- .blurbSummary#Resource-Specification -->
