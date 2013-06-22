@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# /**
+# * <div id="Overview"class="blurbSummary grid_12">
+# * <div class="p">
+# * Vagabondn CLI client. We <span data-todo="Link to Conveyor CLI
+# * once we have it written up.">have plans to replace this with a
+# * general purpose CLI client that takes advantage of the <a
+# * href="/documentation/kibbles/ref/Common-Interface-Standard#Command-Line-Support">commandline
+# * support</a> within the <a
+# * href="/documentation/kibbles/ref/Common-Interface-Standard">Conveyor
+# * Common Interface Standard</a>. We have attempted to construct this
+# * current special purpose processor so as to have a similar
+# * structure and interface as we believe the common CLI will have,
+# * however there are likely to be unsupported changes.
+# * </div>
+# * <div class="p">
+# * The general form of the vagabond CLI command is: <pre><code>
+# * vagabond <resource> <action> [<item ID>] [<name1>=<val1>...]
+# * </code></pre> where '<code>resource</code>' may be:
+# * <code>boxes</code>, <code>environment</code>, or
+# * <code>template</code>. The resource names may be preceeded by
+# * '<code>vagabond-</code>', which would actually be the canonical
+# * name, the shorter versions being provided for user
+# * convenience. The'<code>action</code>' may be
+# * <code>POST|CREATE</code>, <code>GET</code>,
+# * <code>PUT|UPDATE</code>, or <code>DELETE|REMOVE</code>. The
+# * acceapted parameters are dependent on the other arguments and
+# * defined with respect to each action.
+# * </div>
+# * </div><!-- .blurbSummary#Overview -->
+# * <div id="Resource-Specification" class="blurbSummary grid_12">
+# * <div class="p">
+
+# * The Vagabond projet provides three resource:
+# * <ul>
+
+# * <li><code>vagabond-boxes</code>: the universe of canned virtual
+# * machine images. An image is used<span data-perspective="coding
+# * operations"> by the underlying Vagrant service</span> along with
+# * an environment machine configuration<span data-perspective="coding
+# * detailed"> (encoded within a <code>Vagrantfile</code>) </span> to
+# * create each running virtual machine instance.</li>
+# * <li><code>vagabond-environments</code>: the universe of runnable
+# * environment configurations. Each environment configuration
+# * consists of one or more machine configurations. Each machine
+# * configuration is associated to a single virtual machine instance
+# * (which may or may not be created or running).</li>
+# * <li><code>vagabond-templates</code>: the univers<e of environment
+# * templates.  Each temeplate consists of one or more machine
+# * templates. A machine template is a high level (meta) description
+# * of what a running machine instance would look like<span
+# * data-perspective="coding detailed">; embodied in
+# * <code>Vagabondfile</code></span>.
+# * </ul>
+# * </div>
+# * <div class="subHeader"><span><code>vagabond-boxes</code></span></div>
+# * <div class="p">
+
+# * Each <code>
+
+# * </div>
+# * </div><!-- .blurbSummary#Resource-Specification -->
+# */
