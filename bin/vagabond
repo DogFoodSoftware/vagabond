@@ -91,6 +91,16 @@
 #* </div>
 
 # * <div class="subHeader"><span><code>vagabond-environments</code></span></div>
+# * <div class="p">
+# * Whereas a <code>vagabond-templates</code> item describes a
+# * meta-environment, a <code>code-environment</code> item relates to
+# * a runnable environment. Environments exist as <a
+# * href="/documentation/kibbles/lexicon/Runtime-Data</a>runtime
+# * data</a>. Any given machine template (corresponding to a
+# * <code>Vagabondfile</code>) from a <code>vagabond-templates</code>
+# * item may be used to initiate zero or more machine instances in a
+# * given <code>vagabond-environment</code> item.
+# * </div>
 
 # * <div class="subHeader"><span><code>vagabond-boxes</code></span></div>
 
