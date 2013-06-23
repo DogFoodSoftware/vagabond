@@ -6,12 +6,12 @@
 # * See documentation on <a
 # * href="/documentation/vagabond/dev/Understanding-Configuration-Resolution">understanding
 # * confugiration resolution for the details of how the <a
-# * href="/documentation/vagabond/dev/Understanding-ConfigurationResolution#Machine-Configuration">machine
+# * href="/documentation/vagabond/dev/Environment-Runtime-Primer#Runtime-Configuration">machine
 # * level configuration is bounded and interacts with the template defined
 # * configuration.
 # * </div>
 # */
-require "#{File.expand_path(File.dirname(__FILE__))}/machine_config.rb"
+require "#{File.expand_path(File.dirname(__FILE__))}/machine-config.rb"
 
 Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |v|

@@ -54,4 +54,43 @@
     point in the future.
   </div>
 </div><!-- .blurbSummary#Engineering-Environments -->
+<div id="Runtime-Configuration" class="blurbSummary grid_12">
+  <div class="p">
+    The basic environment runtime configuration the set of paird Vagabond
+    modified <code>Vagrantfile</code> and <code>machine_config.rb</code>
+    files. In general, the boundary between 'template level' and 'machine
+    level' configuration is defined on a per-environment basis. The only hard
+    and fast recommendation is that the <code>machine_config.rb</code> file
+    consist entirely of simple variable assigments to literal
+    values.<span class="note">This restriction may very well be loosened. We
+    must pick some starting point.</span>
+  </div>
+  <div class="p">
+    The general convention is to define a set of <code>*_DEFAULT</code>
+    variables at the top of the file. The These may be overriden by
+    the <code>machine-config.rb</code> at runtime, but are not required.
+  </div>
+  <div class="p">
+    After the default parameters, any required parameters are defined
+    in the special array <code>$required_configuration_parameters</code>,
+    which should be defined as null or empty if there are no required
+    parameters. <span data-todo="Implement the library mentioned
+    here."><code>vagabond-runtime-config.rb</code> defines a number of library
+    functions which may be used in a Vagabond
+    compliante <code>Vagrantfile</code> to check for a proper configuration
+    and resolve runtime parameter values.
+  </div>
+  <div class="p">
+    Within the environment, machine runtime configuration is not dynamic
+    beyond initial machine creation.<span class="note">There are approaches
+    one could take. At the moment, they all seem more trouble than they're
+    worth to us so we don't expect to pursue anything other than what is
+    specced here on this point, third party systems are free to innovate,
+    however, and would not be rendered incompatible for adding some layer of
+    runtime dynamism.</span> Machine configuration runtime values are resolved
+    when a machine is created. "Dynamic upgrades" is done by bringing up a
+    similar machine and migrating (or teleporting in VirtualBox terminology)
+    the runtime functions from the original source to the new target.
+  </div>
+</div><!-- .blurbSummary#Runtime-Configuration -->
 
