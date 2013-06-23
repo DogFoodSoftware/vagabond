@@ -7,7 +7,27 @@
   </div>
 </div><!-- .blurbSummary#Overview -->
 <div id="Engineering-Environments" class="blurbSummary grid_12">
-  
+  <div class="subHeader"><span>Environment Boundaries and Interactions</span></div>
+  <div class="p">
+    It is generally useful (at this point) to think of environments as
+    islands, with the possibility of trade. Environments may be
+    self-controlled, or cooridinated / commanded by some external entity. In
+    either case, the environment fundamentally a peer in in the graph. It is
+    the necessary conduit of information and interaction and&mdash;when
+    properly functioning&mdash;can control all it's borders perfectly.
+  </div>
+  <div class="p">
+    Each island-environment is able to negotiate contracts with every other
+    island-environment (akin to setting up point-to-point trade routes in a
+    classically liberal universal market). Each environment may specifically:
+    <ul>
+      <li>delegate service fulfillment via a <em>service contract</em>,</li>,
+      <li>take conditional control of foreign bits via a <em>storage
+      contract</em>, or</li>
+      <li>share semi-private information (ostensibly for the purpose of
+      maintaining security privileges) under a <em>audit contract</em>.</li>
+    </ul>
+  </div>
   <div class="blurbTitle">Engineering Environments</div>
   <div class="subHeader"><span>Environment Sizing</span></div>
   <div class="p">
