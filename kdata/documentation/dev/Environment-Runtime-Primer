@@ -1,0 +1,16 @@
+<div id="Overview" class="blurbSummary grid_12">
+  <div class="p">
+    Vagabond's purpose, experessed in technical terms, is to reliably create
+    environment runtimes for production and organize the runtimes in a way
+    that's "relatively" easy to manage (when compared with other "best
+    avaliable" competitors). Within the context of Vagabond, The twin goals
+    are referred to as 'reliability' and 'evolvability'. Reliability broadly
+    means the ability of the system to perform advertized services without the
+    need for human involvement. The second goal is to model the necessary
+    functions in a way that is most advantageous to improving all other system
+    metrics. It's a classic "first do no harm"... and then do as much good as
+    possible directive.
+  </div>
+  <div class="p">
+  </div>
+</div><!-- .blurbSummary#Overview -->
