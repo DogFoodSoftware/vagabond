@@ -1,16 +1,37 @@
 <div id="Overview" class="blurbSummary grid_12">
   <div class="p">
-    Vagabond's purpose, experessed in technical terms, is to reliably create
-    environment runtimes for production and organize the runtimes in a way
-    that's "relatively" easy to manage (when compared with other "best
-    avaliable" competitors). Within the context of Vagabond, The twin goals
-    are referred to as 'reliability' and 'evolvability'. Reliability broadly
-    means the ability of the system to perform advertized services without the
-    need for human involvement. The second goal is to model the necessary
-    functions in a way that is most advantageous to improving all other system
-    metrics. It's a classic "first do no harm"... and then do as much good as
-    possible directive.
-  </div>
-  <div class="p">
+    An 'environment runtime' is what Vagabond creates. 'Environment runtimes'
+    are concretely collections of running machines (both physical and
+    virtual) organized for some conceptual purpose, like a company's public
+    website or developers test environment.
   </div>
 </div><!-- .blurbSummary#Overview -->
+<div id="Engineering-Environments" class="blurbSummary grid_12">
+  
+  <div class="blurbTitle">Engineering Environments</div>
+  <div class="subHeader"><span>Environment Sizing</span></div>
+  <div class="p">
+    If we think of any non-trivial economic actor&mdash;a company or
+    person&mdash;and look at everything they do, there's always quite a bit
+    going on. For instance, even a small comany&mdash;or a single person
+    operation&mdash;has strictly internal documents, code, designs, plans, or
+    whatever. Stuff their working on or don't want out there. They have a
+    public facing side, with all the stuff they want to communicate to the
+    world. Then there's the friends and familly stuff... like bank account
+    numbers or sexy pictures.
+  </div>
+  <div class="p">
+    You could service all three 'zones' with a single enviromnent that was
+    internally zone aware. Or, you could set up three environments that each
+    served a single zone. There are pros and cons to each approach, an this
+    question of balancing a 'many simple' vs. ' a few integrated' environments
+    is what we mean by 'environment sizing'.
+  </div>
+  <div class="p">
+    For the most part, we've tried to design Vagabond to be neutral on this
+    question of "proper" environment sizing. This neutrality is pragmatic, not
+    doctrinal, meaning Vagabond may evolve or discover preferences on this
+    point in the future.
+  </div>
+</div><!-- .blurbSummary#Engineering-Environments -->
+
