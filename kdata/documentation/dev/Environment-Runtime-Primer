@@ -29,6 +29,15 @@
     </ul>
   </div>
   <div class="blurbTitle">Engineering Environments</div>
+  <div class="subHeader"><span>Environment Composition and Template Disaggregation</span></div>
+  <div class="p">
+    Running environments may be composed from sub-components. Technically, a
+    running environment composed of individual template files
+    (<code>Vagrantfile</code>s) organized under a root environment directory
+    and combined with machine configurations
+    (<code>machine_config.rb</code>). It is therefore trivial to both compose
+    and environmnts and disagregrate template components.
+  </div>
   <div class="subHeader"><span>Environment Sizing</span></div>
   <div class="p">
     If we think of any non-trivial economic actor&mdash;a company or
