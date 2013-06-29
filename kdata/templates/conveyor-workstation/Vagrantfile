@@ -26,8 +26,9 @@ Vagrant.configure("1") do |config|
   end
 
   config.vm.box = "whitebox-opensuse-12_3x64-desktop"
-  config.vm.box_url = "file:///#{File.expand_path('~')/vagabond/data/boxes/whitebox-opensuse-12_3x64-desktop.box"
+  config.vm.box_url = "file:///#{File.expand_path('~')}/vagabond/data/boxes/whitebox-opensuse-12_3x64-desktop.box"
 
   config.ssh.username = 'user'
+  config.ssh.forward_x11 = true
 #  config.ssh.private_key_path = '/home/user/vagabond/secure_id_rsa'
 end
