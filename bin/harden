@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#/**
+# * <div id="Overview" class="blurbSummary grid_12">
+# * <div class="p">
+# * Script to harden a Vagabond environment. Specifically, the script does two
+# * things:
+# * <ol>
+# * <li>Generates a unique environment key and distributes to all (Vagrant)
+# * machine images in the environment.</li>
+# * <li>Generates or accepts an environment password (used to sign into the
+# * <code>user</code> account) and updates all machine images in the
+# * environment.</li>
+# * </ol>
+# * </div>
+# * </div><!-- .blurbSummary#Overview -->
+# * <div id="Current-Limitations" class="blurbSummary grid_12">
+# * <div class="subHeader"><span>Single Machine Environments</span></div>
+# * <div class="p">
+# * The current implementation is assumes single machine environments in which
+# * the single machine configuration is an immediate child of the provided
+# * environment path. Future versions will traverse all sub-directories,
+# * applying correctness tests to each. The <code>-f|--force</code> option
+# * will allow users to skip the checks and harden each machine that matches
+# * and ignore anything that doesn't. Otherwise, any correctness failure will
+# * cause the entire process to fail.
+# * </div>
+# * <div class="p">
+# * It would be interesting to locate the checks in a separate file that could
+# * be inculded by a runtime check as well. This would be in support of
+# * expanding the standard tests to support runtime / production checks as
+# * well / in parallel with code checks. We could support code checks for
+# * development and initial install and runtime checks to help verify
+# * integrity of the running system.
+# * </div>
+# * </div><!-- .blurbSummary#Current-Limitations -->
+# */
+
+ENVIRONMENT_PATH="$1"
+ENVIRONMENT_BASE="`dirname $0`/../data/environment"
+cd "$ENVIRONMENT_BASE/$ENVIRONMENT_PATH"
+ENVIRONMENT_PATH=$PWD
+# ENVIRONMENT_PATH is now the absolute directory
+
+if [ ! -d "$ENVIRONMENT_PATH" ]; then
+    echo "Environment not found in '$ENVIRONMENT_PATH'." 1>&2
+    exit 1
+fi
+if [ ! -f "$ENVIRONMENT_PATH/Vagrantfile" ]; then
+    echo "Environment incomplete, no 'Vagrantfile'." 1>&2
+    exit 1
+fi
+if [ ! -f "$ENVIRONMENT_PATH/machine.rb" ]; then
+    echo "Environment incomplete, no 'machine.rb'." 1>&2
+    exit 1
+fi
+# everything looks good
+
