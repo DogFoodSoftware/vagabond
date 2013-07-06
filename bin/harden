@@ -80,9 +80,10 @@ ENVIRONMENT_PATH="$1"
 # development path. This is because Vagabond supports stand alone
 # installation, and the project directory is not guaranteed to be deployed in
 # a Conveyor context.
-ENVIRONMENT_BASE="`dirname $0`/../data/environment"
-cd "$ENVIRONMENT_BASE/$ENVIRONMENT_PATH"
-ENVIRONMENT_PATH=$PWD
+VAGABOND_BASE="`dirname $0`/../"
+cd $VAGABOND_BASE
+VAGABOND_BASE="$PWD"
+ENVIRONMENT_BASE="$VAGABOND_BASE/data/environment"
 
 if [ ! -d "$ENVIRONMENT_PATH" ]; then
     echo "Environment not found in '$ENVIRONMENT_PATH'." 1>&2
@@ -97,6 +98,18 @@ if [ ! -f "$ENVIRONMENT_PATH/machine.rb" ]; then
     exit 1
 fi
 # everything looks good
+ACCOUNT_NAME=user
+
+# generate key
+# Clear failed work directory if present.
+WORKING_DIR="$VAGABOND_BASE/data/harden/$ACCOUNT_NAME/
+if [ -d "$WORKING_DIR" ]; then
+    # TODO: Check no '.lock' file; exit if so.
+    rm 
+
+# distribute key
+# TODO: would be nice to do a 'secure delete' just to be safe
+# update password
 
 #/**
 # * </div><!-- .blurbSummary#Implemntation -->
