@@ -100,17 +100,25 @@ fi
 # everything looks good
 ACCOUNT_NAME=user
 
-# generate key
-# Clear failed work directory if present.
-WORKING_DIR="$VAGABOND_BASE/data/harden/$ACCOUNT_NAME/
+# First, set up working directory.
+WORKING_DIR="$VAGABOND_BASE/data/harden/$ACCOUNT_NAME/"
 if [ -d "$WORKING_DIR" ]; then
     # TODO: Check no '.lock' file; exit if so.
-    rm 
+    # Clean out any lingering work directory.
+    rm -rf "$WORKING_DIR"
+fi
+touch "$WORKING_DIR/lock"
+# TODO: Add exit handler to delete lock file.
 
-# distribute key
+# Generate key.
+# TODO: Look into using the -G/-T modality tests.
+ssh-keygen -f "$WORKING_DIR/id_rsa" -t rsa -b 2048
+
+# Distribute key.
 # TODO: would be nice to do a 'secure delete' just to be safe
 # update password
 
+rm "$WORKING_DIR/lock"
 #/**
 # * </div><!-- .blurbSummary#Implemntation -->
 # */
