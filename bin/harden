@@ -2,8 +2,8 @@
 #/**
 # * <div id="Overview" class="blurbSummary grid_12">
 # * <div class="p">
-# * Script to harden a Vagabond environment. Specifically, the script does two
-# * things:
+# * Script to harden a Vagabond environment account. Specifically, the script
+# * does two things:
 # * <ol>
 # * <li>Generates a unique environment key and distributes to all (Vagrant)
 # * machine images in the environment.</li>
