@@ -88,8 +88,8 @@
     about the versions not matching. In practice, the guest additions are
     compatible enough and everything should work fine. We do intend to
     automate the update of guest additions in the
-    future.<span class="note">There was a <a href="
-    http://blog.csanchez.org/2012/05/03/automatically-download-and-install-virtualbox-guest-additions-in-vagrant/">plugin</a>
+    future.<span class="note">There was
+    a <a href="http://blog.csanchez.org/2012/05/03/automatically-download-and-install-virtualbox-guest-additions-in-vagrant/">plugin</a>
     for Vagrant v1, and in theory the process should be relatively easy to
     automate with a shell script. It's on the TODO list.</span>
   </div>
