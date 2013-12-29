@@ -25,12 +25,20 @@
 <div id="Prerequisites" class="grid_12 blurbSummary">
   <div class="blurbTitle">Prerequisites</div>
   <div class="p">
-    Before jumping into Vagabond proper, you will need to set up three pieces of
-    software: 
-    <a href="www.virtualbox.org">Virtual Box</a>,
+    Before jumping into Vagabond proper, you will need to set up some
+    software. Everyone will need <a href="www.virtualbox.org">Virtual Box</a>,
     <a href="www.vagrantup.com">Vagrant</a>,
-    and <a href="http://git-scm.com/">git</a>. If already installed, please
-    check the versions are reasonable up to date with those quoted below.
+    and <a href="http://git-scm.com/">git</a>. If you have problems, you may
+    want to check some of the version notes below, especilly as regards VirtualBox.
+  </div>
+  <div class="p">
+    That's it for Linux/BSD users. Mac and windows will need to install
+    an <a href="http://en.wikipedia.org/wiki/X_Window_System">X Window
+    </a> client. We
+    recommend <a href="http://xquartz.macforge.org/landing/">XQuartz</a>
+    and <a href="http://sourceforge.net/projects/xming">Xming</a>
+    respectively&mdash;only because that's what we use. We've done no
+    comparisons.
   </div>
   <div class="subHeader"><span>Vagrant</span></div>
   <div class="p">
@@ -44,7 +52,17 @@
     <a href="https://www.virtualbox.org/wiki/Downloads">Download</a> the
     latest version of VirtualBox for your operating system. A relatively
     recent version is probably available to Linux users via their distro
-    package manager. We have used 4.1.x and 4.2.x.
+    package manager. We have used 4.1.x and 4.2.x. Desktop users will also
+    need to install the VirtualBox extensions pack. Unfortunately, VirtualBox
+    releases are geared towards developers more than users, and they do
+    release versions with bugs. If you have problems, you may want to
+    downgrade to the last known good version for all supported platforms:
+    4.2.12.<span class="note">The 4.2.14 release in particular would fail
+    cryptically when attempting to initialize a new VM with <code>vagrant
+    up</code>; something was broken in the import on Mac 10.8 for some large
+    subset of users. There have been issues in the past with permissions on
+    both Mac and Windows. A couple serious release issues per year does not
+    seem uncommon.</span>
   </div>
   <div class="p">
     It shouldn't cause any problems, but you may want to take a look at the
@@ -74,7 +92,12 @@
 <div id="Installing-Vagabond" class="blurbSummary grid_12">
   <div class="blurbTitle">Installing Vagabond</div>
   <div class="p">
-    To install Vagabond, you simply clone the 
+    To install Vagabond, most users will want to download a TAR of the latest
+    release. Vagabond can also be run from a git clone, making extending and
+    customizing your own version relatively simple. Until general release,
+    however, we do not recommend this method for non-Vagabond
+    contributors. 3rd parties will want to wait till the product fully
+    stabalizes.
   </div>
 </div><!-- .blurbSummary#Installing-Vagabond -->
 <div id="Troubleshooting" class="blurbSummary grid_12">

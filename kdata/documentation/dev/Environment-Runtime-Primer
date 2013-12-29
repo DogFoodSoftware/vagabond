@@ -1,0 +1,105 @@
+<div id="Overview" class="blurbSummary grid_12">
+  <div class="p">
+    An 'environment runtime' is what Vagabond creates. 'Environment runtimes'
+    are concretely collections of running machines (both physical and
+    virtual) organized for some conceptual purpose, like a company's public
+    website or developers test environment.
+  </div>
+</div><!-- .blurbSummary#Overview -->
+<div id="Engineering-Environments" class="blurbSummary grid_12">
+  <div class="subHeader"><span>Environment Boundaries and Interactions</span></div>
+  <div class="p">
+    It is generally useful (at this point) to think of environments as
+    islands, with the possibility of trade. Environments may be
+    self-controlled, or cooridinated / commanded by some external entity. In
+    either case, the environment fundamentally a peer in in the graph. It is
+    the necessary conduit of information and interaction and&mdash;when
+    properly functioning&mdash;can control all it's borders perfectly.
+  </div>
+  <div class="p">
+    Each island-environment is able to negotiate contracts with every other
+    island-environment (akin to setting up point-to-point trade routes in a
+    classically liberal universal market). Each environment may specifically:
+    <ul>
+      <li>delegate service fulfillment via a <em>service contract</em>,</li>,
+      <li>take conditional control of foreign bits via a <em>storage
+      contract</em>, or</li>
+      <li>share semi-private information (ostensibly for the purpose of
+      maintaining security privileges) under a <em>audit contract</em>.</li>
+    </ul>
+  </div>
+  <div class="blurbTitle">Engineering Environments</div>
+  <div class="subHeader"><span>Environment Composition and Template Disaggregation</span></div>
+  <div class="p">
+    Running environments may be composed from sub-components. Technically, a
+    running environment composed of individual template files
+    (<code>Vagrantfile</code>s) organized under a root environment directory
+    and combined with machine configurations
+    (<code>machine_config.rb</code>). It is therefore trivial to both compose
+    and environmnts and disagregrate template components.
+  </div>
+  <div class="subHeader"><span>Environment Sizing</span></div>
+  <div class="p">
+    If we think of any non-trivial economic actor&mdash;a company or
+    person&mdash;and look at everything they do, there's always quite a bit
+    going on. For instance, even a small comany&mdash;or a single person
+    operation&mdash;has strictly internal documents, code, designs, plans, or
+    whatever. Stuff their working on or don't want out there. They have a
+    public facing side, with all the stuff they want to communicate to the
+    world. Then there's the friends and familly stuff... like bank account
+    numbers or sexy pictures.
+  </div>
+  <div class="p">
+    You could service all three 'zones' with a single enviromnent that was
+    internally zone aware. Or, you could set up three environments that each
+    served a single zone. There are pros and cons to each approach, an this
+    question of balancing a 'many simple' vs. ' a few integrated' environments
+    is what we mean by 'environment sizing'.
+  </div>
+  <div class="p">
+    For the most part, we've tried to design Vagabond to be neutral on this
+    question of "proper" environment sizing. This neutrality is pragmatic, not
+    doctrinal, meaning Vagabond may evolve or discover preferences on this
+    point in the future.
+  </div>
+</div><!-- .blurbSummary#Engineering-Environments -->
+<div id="Runtime-Configuration" class="blurbSummary grid_12">
+  <div class="p">
+    The basic environment runtime configuration the set of paird Vagabond
+    modified <code>Vagrantfile</code> and <code>machine_config.rb</code>
+    files. In general, the boundary between 'template level' and 'machine
+    level' configuration is defined on a per-environment basis. The only hard
+    and fast recommendation is that the <code>machine_config.rb</code> file
+    consist entirely of simple variable assigments to literal
+    values.<span class="note">This restriction may very well be loosened. We
+    must pick some starting point.</span>
+  </div>
+  <div class="p">
+    The general convention is to define a set of <code>*_DEFAULT</code>
+    variables at the top of the file. The These may be overriden by
+    the <code>machine-config.rb</code> at runtime, but are not required.
+  </div>
+  <div class="p">
+    After the default parameters, any required parameters are defined
+    in the special array <code>$required_configuration_parameters</code>,
+    which should be defined as null or empty if there are no required
+    parameters. <span data-todo="Implement the library mentioned
+    here."><code>vagabond-runtime-config.rb</code> defines a number of library
+    functions which may be used in a Vagabond
+    compliante <code>Vagrantfile</code> to check for a proper configuration
+    and resolve runtime parameter values.
+  </div>
+  <div class="p">
+    Within the environment, machine runtime configuration is not dynamic
+    beyond initial machine creation.<span class="note">There are approaches
+    one could take. At the moment, they all seem more trouble than they're
+    worth to us so we don't expect to pursue anything other than what is
+    specced here on this point, third party systems are free to innovate,
+    however, and would not be rendered incompatible for adding some layer of
+    runtime dynamism.</span> Machine configuration runtime values are resolved
+    when a machine is created. "Dynamic upgrades" is done by bringing up a
+    similar machine and migrating (or teleporting in VirtualBox terminology)
+    the runtime functions from the original source to the new target.
+  </div>
+</div><!-- .blurbSummary#Runtime-Configuration -->
+
