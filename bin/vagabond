@@ -93,7 +93,7 @@
 # * <div class="subHeader"><span><code>vagabond-environments</code></span></div>
 # * <div class="p">
 # * Whereas a <code>vagabond-templates</code> item describes a
-# * meta-environment, a <code>code-environment</code> item relates to
+# * meta-environment, a <code>vagabond-environment</code> item relates to
 # * a runnable environment. Environments exist as <a
 # * href="/documentation/kibbles/lexicon/Runtime-Data</a>runtime
 # * data</a>. Any given machine template (corresponding to a
@@ -101,9 +101,29 @@
 # * item may be used to initiate zero or more machine instances in a
 # * given <code>vagabond-environment</code> item.
 # * </div>
-
 # * <div class="subHeader"><span><code>vagabond-boxes</code></span></div>
-
+# * <div class="p">
+# *   A <code>vagabond-box</code> is a running virtual machine instance.
+# * </div>
+# * </div>
+# * <div class="subHeader"><span><code>vagabond-images</code></span></div>
+# * <div class="p">
+# *   A <code>vagabond-image</code> is a base box image used to create a runtime
+# *   <code>vagabond-box</code>
+# * </div>
+# * </div>
+# * <div class="subHeader"><span><code>vagabond-snapshot</code></span></div>
+# * <div class="p">
+# *   A <code>vagabond-image</code> is a disk-snapshot of an enviornment
+# *   runtime; a live backup.
+# * </div>
 # * </div>
 # * </div><!-- .blurbSummary#Resource-Specification -->
 # */
+
+# Within environmonts, you can have any number of sub-environments. So, the
+# environment cookbook might pull in a 'apache cloud' environment to provide
+# self-scaling HTTP front end processing. Each vagabond-box is a minimal
+# vagabond-envioronment
+
+vagabond snapshot PUT auto-id source=/vagabond-environment/jmfa-fraudmanager
