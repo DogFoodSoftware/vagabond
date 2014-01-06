@@ -1,5 +1,32 @@
 <div id="Reference-Documentation" class="blurbSummary grid_12">
   <div class="blurbTitle">Reference Documentation</div>
   <div class="p">
+    <ul>
+      <li><a href="http://www.3ware.com/support/userdocs/9000-series-cliguide-3-07.pdf">CLI
+	  Guide</a></li>
+    </ul>
   </div>
 </div><!-- #Reference-Docs.blurbSummary -->
+<div id="Weekly-Manual-Check" class="blurbSummary grid_12">
+  <div class="blurbTitle">Weekly Manual Check</div>
+  <div class="p">
+    <ol>
+      <li>Log into Vagabond Host via SSH.</li>
+      <li>From the bash prompt, execute: <code>sudo ./raid.9.5.3/cli/tw_cli</code></li>
+      <li>From the RAID CLI prompt, execute: <code>show</code>. Note the value
+      in the 'Ctl' column for each controller.</li>
+      <li>Form the RAID CLI prompt, execute: <code>show /&lt;controller
+      ID&gt;</code>. Verify that the 'Status' of each 'Unit', 'VPort' and
+      'bbu' is 'OK'.</li>
+      <li>Cound the number of 'ports' == hard drives.
+      <li>From the RAID CLI prompt, execute: <code>quit</code>.</li>
+      <li>From the bash prompt, execute: <code>smartctl -A -data -d 3ware,0
+      /dev/twa0</code>. If SSD, you will see a 'Media_Wearout_Indicator' or
+      'SSDLife'. '100' is best, '0' is worst. Mark drive for replacement
+      at... 25?.</li>
+      <li>Repeat command with '3ware,1', '3ware,2', etc. for each drive. Check
+      all SSD. For non-SSD... I'm not really sure. Need to update this
+      section. An 'input/output' error means there's no drive connected to
+      that port (or the drive is totally toast).
+  </div>
+</div><!-- #Weekly-Manual-Check.blurbSummary -->
