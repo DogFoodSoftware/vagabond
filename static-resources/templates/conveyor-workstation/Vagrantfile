@@ -65,11 +65,12 @@ end # close anonymous config block
 #  *   <code>authorized_keys</code> will be refreshed. This may not be the
 #  *   desired behavior on high security hosts. For most users, the automated
 #  *   hardening enabled by this automatic key set up far outweighs the
-#  *   relatively slight negative effect on the hosts security. If an attacker
-#  *   has access to your admin account, you're hosed anyway. Vulnerabilities
-#  *   in the file system that would allow a non-admin user to write to the
-#  *   admin's protected directory, or unprotect the directory, could be
-#  *   exploited for an escelation attack.
+#  *   relatively slight negative effect on the hosts security. <span
+#  *   data-perspective="detailed">If an attacker has access to your admin
+#  *   account, you're hosed anyway. Vulnerabilities in the file system that
+#  *   would allow a non-admin user to write to the admin's protected
+#  *   directory, or unprotect the directory, could be exploited for an
+#  *   escelation attack.</span>
 #  * </div>
 #  */
 def setup_keys()
