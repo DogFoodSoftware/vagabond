@@ -50,9 +50,10 @@ SCRIPT
 # TODO: Update to latest installed file after production release. DFS site
 # should always be running of the latest release, so grab their copy.
 wget http://dogfoodsoftware.com/bitbucket/conveyor-install
-bash conveyor-install > conveyor-install-log
+sudo -u user bash conveyor-install > conveyor-install-log 2>&1
 rm conveyor-install
 SCRIPT
+  config.vm.provision "shell", :inline => $INSTALL_WORKSTATION_DISTRO_PACKAGES
 
 end # close anonymous config block
 
