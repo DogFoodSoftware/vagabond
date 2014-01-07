@@ -18,7 +18,7 @@ VAGRANTFILE_API_VERSION_2 = "2"
 OUR_DIR=File.dirname(File.expand_path(__FILE__))
 # Once we standardize on ruby 1.9, we prefer:
 # KEYS_DIR="#{Dir.home}/.conveyor/keys"
-KEYS_DIR="#{File.expand_path('~')}/.conveyor/keys
+KEYS_DIR="#{File.expand_path('~')}/.conveyor/keys"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION_2) do |config|
   # Set up base box parameters.
