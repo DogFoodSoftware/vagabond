@@ -1,0 +1,124 @@
+#!/bin/bash
+#/**
+# * <div id="Overview" class="blurbSummary grid_12">
+# * <div class="p">
+# * Script to harden a Vagabond environment account. Specifically, the script
+# * does two things:
+# * <ol>
+# * <li>Generates a unique environment key and distributes to all (Vagrant)
+# * machine images in the environment.</li>
+# * <li>Generates or accepts an environment password (used to sign into the
+# * <code>user</code> account) and updates all machine images in the
+# * environment.</li>
+# * </ol>
+# * </div>
+# * </div><!-- .blurbSummary#Overview -->
+# * <div id="Current-Limitations" class="blurbSummary grid_12">
+# * <div class="subHeader"><span>Single Machine Environments</span></div>
+# * <div class="p">
+# * The current implementation is assumes single machine environments in which
+# * the single machine configuration is an immediate child of the provided
+# * environment path. Future versions will traverse all sub-directories,
+# * applying correctness tests to each. The <code>-f|--force</code> option
+# * will allow users to skip the checks and harden each machine that matches
+# * and ignore anything that doesn't. Otherwise, any correctness failure will
+# * cause the entire process to fail.
+# * </div>
+# * <div class="p">
+# * It would be interesting to locate the checks in a separate file that could
+# * be inculded by a runtime check as well. This would be in support of
+# * expanding the standard tests to support runtime / production checks as
+# * well / in parallel with code checks. We could support code checks for
+# * development and initial install and runtime checks to help verify
+# * integrity of the running system.
+# * </div>
+# * <div class="subHeader"><span>General Account Management</span></subHeader>
+# * <div class="p">
+# * Future versions will accept a <code>-a|--account-handle<code> flag
+# * indicating the account to update in place of the default <code>user</code>
+# * account.
+# * </div>
+# * <div class="subHeader"><span>Macine Subsets</span></subHeader>
+# * <div class="p">
+# * Future versions will accept multiple environment paths allowing the
+# * process to operate on multiple environments or environment
+# * subsets. Subsets simply specify a path within an environment rather than
+# * the environment root.
+# * </div>
+# * <div class="subHeader"><span>Authorization Checks</span></subHeader>
+# * <div class="p">
+# * The current implementation performs no authorization checks. In general,
+# * the bash scripts are trusted, and access to the script imlicitly grants
+# * authorization. In order to support web services, however, we do want to
+# * provide the ability to request an authorization check prior to executing
+# * the command with the <code>--check-authorizations</code> option. The
+# * implementation would process the normalized set of target machines against
+# * the user's environment local account name as specified by the
+# * <code>-a|--account-handle</code>. The <code>user</code> user account is
+# * incompatible with this option and always exits with an authorization
+# * failure, which is checked by the script. For all other accounts, we check
+# * <code>authorizations/?subject=/users/&lt;environment&gt;/&lt;handle&gt;&amp;operation=/vagrants/manage-account&amp;target=/vagrants/&lt;machine
+# * path&gt;</code> resource to determine authorization.
+# * </div>
+# * <div class="subHeader"><span>Web Service Considerations</span></subHeader>
+# * <div class="p">
+# * With the above in place, we believe we have a solid and secure foundation
+# * for exposing these operations through a web service. The web service will
+# * probably want to do it's own authorization checks. This small amount of
+# * duplicate code is acceptable to support consistency in implementation. The
+# * script would support updating the SSH key and user password.
+# * </div>
+# * </div><!-- .blurbSummary#Current-Limitations -->
+# * <div id="Implementation" class="blurbSummary grid_12" data-perspective="implementation">
+# * <div class="blurbTitle">Implementation</div>
+# */
+
+ENVIRONMENT_PATH="$1"
+# For aesthetics, we want to set up ENVIRONMENT_PATH as an absolute
+# directory. In bash, it's a bit of a trick, using the 'PWD' environment
+# var. Notice that we're using '$0' rather than specifying the Conveyor
+# development path. This is because Vagabond supports stand alone
+# installation, and the project directory is not guaranteed to be deployed in
+# a Conveyor context.
+VAGABOND_BASE="`dirname $0`/../"
+cd $VAGABOND_BASE
+VAGABOND_BASE="$PWD"
+ENVIRONMENT_BASE="$VAGABOND_BASE/data/environment"
+
+if [ ! -d "$ENVIRONMENT_PATH" ]; then
+    echo "Environment not found in '$ENVIRONMENT_PATH'." 1>&2
+    exit 1
+fi
+if [ ! -f "$ENVIRONMENT_PATH/Vagrantfile" ]; then
+    echo "Environment incomplete, no 'Vagrantfile'." 1>&2
+    exit 1
+fi
+if [ ! -f "$ENVIRONMENT_PATH/machine.rb" ]; then
+    echo "Environment incomplete, no 'machine.rb'." 1>&2
+    exit 1
+fi
+# everything looks good
+ACCOUNT_NAME=user
+
+# First, set up working directory.
+WORKING_DIR="$VAGABOND_BASE/data/harden/$ACCOUNT_NAME/"
+if [ -d "$WORKING_DIR" ]; then
+    # TODO: Check no '.lock' file; exit if so.
+    # Clean out any lingering work directory.
+    rm -rf "$WORKING_DIR"
+fi
+touch "$WORKING_DIR/lock"
+# TODO: Add exit handler to delete lock file.
+
+# Generate key.
+# TODO: Look into using the -G/-T modality tests.
+ssh-keygen -f "$WORKING_DIR/id_rsa" -t rsa -b 2048
+
+# Distribute key.
+# TODO: would be nice to do a 'secure delete' just to be safe
+# update password
+
+rm "$WORKING_DIR/lock"
+#/**
+# * </div><!-- .blurbSummary#Implemntation -->
+# */
