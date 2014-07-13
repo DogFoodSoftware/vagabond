@@ -1,0 +1,43 @@
+== General Goal ==
+
+Set up a rudimentary environment. Specifically, two router / DNS +
+webserver.
+
+Technecilly, enable 'con environments create <ENV NAME> <TEMPLATE BASE>'
+
+== Steps ==
+
+*) Grab '<TEMPLATE BASE>/Vagrantfile.env-base-box', copy to
+   '~/playground/vagabond/data/environments/<ENV NAME>/tmp-bootstrap-box'
+*) Run 'vagrant up' to initialize base box.
+*) Use vagrant to create environment base box.
+*) Delete the temporary bootstrap box base.
+*) Grab '<TEMPLATE BASE>/Vagrantfile.env-controller', copy to
+  '~/playground/vagabond/data/environments/<ENV NAME>/eco-controller-1.<ENV NAME>'
+*) Initialiez eco-controller-1.<ENV NAME>
+*) Grab '<TEMPLATE BASE>/Vagrantfile.env-controller', copy to
+  '~/playground/vagabond/data/environments/<ENV NAME>/eco-controller-2.<ENV NAME>'
+*) Initialiez eco-controller-2.<ENV NAME>
+*) Configure 'eco-controller-<HOSTNAME>.<ENV BAME>' and
+ eco-controler-(1|2).<ENV NAME>' in both servers. Both are masters.
+
+== Eco Controller Setup ==
+
+*) Configure eco-controllers as routers for private network.
+*) Generate 16 character random string password for initial
+   access. Report to user on CLI.
+*) Generate self signed web cert. Report fingerprint to user on CLI.
+*) Setup controller web services with SSL and HTTP basic access using
+   admin/<generated password>
+
+Now have rudimentary setup necessary to setup additional serves. First
+up, is a web server.
+
+== Single Web Server Setup ==
+
+*) Specify public IP and DNS names.
+*) Setup entries in the DNS servers.
+*) Setup routing from eco-controllers to web server.
+*) Bind controllors to public IP.
+*) Setup configuration for web server (document base from git repository).
+
