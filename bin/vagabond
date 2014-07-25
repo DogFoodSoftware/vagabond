@@ -1,5 +1,5 @@
-#!/bin/bash
-
+#!/usr/bin/env php
+<?php
 # /**
 # * <div id="Overview"class="blurbSummary grid_12">
 # * <div class="p">
@@ -126,28 +126,57 @@
 # self-scaling HTTP front end processing. Each vagabond-box is a minimal
 # vagabond-envioronment
 
-RESOURCE="$1"
-ACTION="$2"
-
 # Process parameters.
 
-PARAMETERS=`getopt --name="$0" -a --longoptions=from:,to: -o f:,t: -- "$@"`
-eval set -- "$PARAMETERS"
+# Based on script from: http://php.net/manual/en/function.getopt.php#100573
+$parameters = array(
+    "f:" => "from:",
+    "t:" => "to:");
 
-until [ "$1" == "--" ]; do
-    case "$1" in
-        --from|f)
-            FROM="$2";;
-        --to|t)
-            TO="$2";;
-    esac
-    shift
-done
-shift
+# Notice we do NOT use 'array_values'; the 
+$options = getopt(implode('', array_keys($parameters)), $parameters);
+$pruneargv = array();
+foreach ($options as $option => $value) {
+  print "$option\n";
+  foreach ($argv as $key => $chunk) {
+    $regex = '/^'. (isset($option[1]) ? '--' : '-') . $option . '/';
+    if ($chunk == $value && $argv[$key-1][0] == '-' || preg_match($regex, $chunk)) {
+      array_push($pruneargv, $key);
+    }
+  }
+}
+while ($key = array_pop($pruneargv)) unset($argv[$key]);
+
+$FROM = $options['from'] ?: $options['f'];
+$TO = $options['to'] ?: $options['t'];
+
+$RESOURCE=$argv[1];
+$VERB=$argv[2];
+
+print "RESOURCE : $RESOURCE\nVERB : $VERB\n$argv[3]";
+
+exit();
+?>
+# Dispatch request based on 
+
+case "$RESOURCE" in
+    'hosts')
+	case "$ACTION" in
+	    'create')
+		hosts_create();;
+	    *)
+		echo "Unknown action '$ACTION'." >&2;;
+	esac;;
+    *)
+	echo "Uknown resource '$RESOURCE'." >&2;;
+esac
+
+
+exit();
 
 # Execute request.
 
-function environments_create() {
+function hosts_create() {
     if [ x"$FROM" == x"" ]; then
 	echo "Must specify '--from' parameter." >&2
 	exit 1
@@ -163,7 +192,7 @@ function environments_create() {
     # Okay, let's test each. Must be either an SSH URL or a local path.
     local FROM_CMD_PREFIX TO_CMD_PREFIX FROM_PATH TO_PATH
     
-    if [[ x "$FROM" == x"ssh://" ]]; then
+    if [[ x"$FROM" == x"ssh://" ]]; then
 	FROM_CMD_PREFIX="ssh ${$FROM:6}"
 	FROM_PATH="${FROM#*/}"
     elif [ -d "$FROM" ]; then
@@ -283,15 +312,3 @@ function environments_create() {
     # echo -e $TO_CMD_PREFIX eval "mkdir .vagrant/machines/default/virtualbox; echo $NEW_HOST_ID > .vagrant/machines/default/virtualbox/id"
     # $TO_CMD_PREFIX eval "mkdir .vagrant/machines/default/virtualbox; echo $NEW_HOST_ID > .vagrant/machines/default/virtualbox/id"
 }
-
-case "$RESOURCE" in
-    'environments')
-	case "$ACTION" in
-	    'create')
-		environments_create();;
-	    *)
-		echo "Unknown action '$ACTION'." >&2;;
-	esac;;
-    *)
-	echo "Uknown resource '$RESOURCE'." >&2;;
-esac
