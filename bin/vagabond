@@ -126,4 +126,172 @@
 # self-scaling HTTP front end processing. Each vagabond-box is a minimal
 # vagabond-envioronment
 
-vagabond snapshot PUT auto-id source=/vagabond-environment/jmfa-fraudmanager
+RESOURCE="$1"
+ACTION="$2"
+
+# Process parameters.
+
+PARAMETERS=`getopt --name="$0" -a --longoptions=from:,to: -o f:,t: -- "$@"`
+eval set -- "$PARAMETERS"
+
+until [ "$1" == "--" ]; do
+    case "$1" in
+        --from|f)
+            FROM="$2";;
+        --to|t)
+            TO="$2";;
+    esac
+    shift
+done
+shift
+
+# Execute request.
+
+function environments_create() {
+    if [ x"$FROM" == x"" ]; then
+	echo "Must specify '--from' parameter." >&2
+	exit 1
+    fi
+    if [ x"$TO" == x"" ]; then
+	echo "Must specify '--to' parameter." >&2
+	exit 1
+    fi
+
+    # Set up local DB prefix.
+    local TFER_DIR="_tfer_dir"
+
+    # Okay, let's test each. Must be either an SSH URL or a local path.
+    local FROM_CMD_PREFIX TO_CMD_PREFIX FROM_PATH TO_PATH
+    
+    if [[ x "$FROM" == x"ssh://" ]]; then
+	FROM_CMD_PREFIX="ssh ${$FROM:6}"
+	FROM_PATH="${FROM#*/}"
+    elif [ -d "$FROM" ]; then
+	FROM_CMD_PREFIX=""
+	FROM_PATH="$FROM"
+    else
+	echo "'--from' parameter must be SSH URL ('ssh://...') or a local path." >&2
+	exit 1
+    fi
+
+    if [[ x"$TO" == x"ssh://"* ]]; then
+	TO_CMD_PREFIX="ssh ${$TO:6}"
+	TO_PATH="${TO#*/}"
+    elif [ -d "$TO" ]; then
+	TO_CMD_PREFIX=""
+	TO_PATH="$TO"
+    else
+	echo "'--to' parameter must be SSH URL ('ssh://...') or a local path." >&2
+	exit 1
+    fi
+
+    # TODO: Find our standard lib and turn all these 'verbos echos into vechos (I think).
+    echo -e "FROM : $FROM\nFROM_CMD_PREFIX : $FROM_CMD_PREFIX\nFROM_PATH : $FROM_PATH\nTO : $TO\nTO_CMD_PREFIX : $TO_CMD_PREFIX\nTO_PATH : $TO_PATH"
+
+    # Verify we can connect to any non-local sources.
+    if [ x"$TO_CMD_PREFIX" != x"" ]; then
+	ssh -o 'PreferredAuthentications=publickey' "$TO_CMD_PREFIX" "echo" > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+	    echo "Could establish SSH connection to target ($TO_CMD_PREFIX); setup key-based authentication." >&2
+	    exit 1
+	fi
+    fi
+    if [ x"$FROM_CMD_PREFIX" != x"" ]; then
+	ssh -o 'PreferredAuthentications=publickey' "$FROM_CMD_PREFIX" "echo" > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+	    echo "Could establish SSH connection to target ($FROM_CMD_PREFIX); setup key-based authentication." >&2
+	    exit 1
+	fi
+    fi
+
+    # Verify $TO is free (we do this first cause it's easy).
+    if ! $TO_CMD_PREFIX test -e $TO_PATH; then
+	echo "File or directory blocks target location '$TO'." >&2
+	exit 1
+    fi
+
+    # Verify $FROM is valid export target.
+    if $FROM_CMD_PREFIX test -e $FROM_PATH; then
+	echo "No source directory found at '$FROM'." >&2
+	exit 1
+    elif $FROM_CMD_PREFIX test -f $FROM_PATH/Vagrantfile; then
+	echo "No source 'Vagrantfile' found at '$FROM/Vagrantfile'." >&2
+	exit 1
+    elif $FROM_CMD_PREFIX test -d $FROM_PATH/.vagrant/machines/default/virtualbox/id; then
+	echo "No VirtualBox ID found (in '$FROM/.vagrant)." >&2
+	exit 1
+    fi
+
+    # Finally, check to see that the source VM is not currently running.
+    # TODO: Before going production, we need to do a file lock or something. We want exports to queue up with each other and backups. And later, to allow for configurable concurrent defaulting to per-physical host or something.
+    local SOURCE_ID=`$FROM_CMD_PREFIX eval "cd $FROM_PATH; cat .vagrant/machines/default/virtualbox/id"`
+    local FROM_STATE=`$FROM_CMD_PREFIX eval "$FROM_CMD_PREFIX VBoxManage showvminfo $SOURCE_ID | grep State: "`
+    if [ x"$SOURCE_ID" == x"" ]; then
+	echo "Could not retrieve source VM ID." >&2
+    fi
+    echo -e "SOURCE_ID : $SOURCE_ID\nFROM_STATE : $FROM_STATE"
+
+    if [[ $FROM_STATE != *'powered off'* ]] then
+	echo -e "VM at '$FROM' is not shut down. Got:\n\t$FROM_STATE" >&2
+	exit 1
+    fi
+
+    # Looks like the source is valid and the destination clear. Create prefixes for the SCP copy.
+    local FROM_SCP_PREFIX TO_SCP_PREFIX
+    if [ x"" != x"$FROM_CMD_PREFIX" ]; then
+	FROM_SCP_PREFIX="${FROM_CMD_PREFIX}:"
+    fi
+    if [ x"" != x"$TO_CMD_PREFIX" ]; then
+	TO_SCP_PREFIX="${TO_CMD_PREFIX}:"
+    fi
+    echo -e "FROM_SCP_PREFIX : $FROM_SCP_PREFIX\nTO_SCP_PREFIX : $TO_SCP_PREFIX"
+
+    # Okay, everything checks out for transfer.
+
+    # 1) Use ssh to issue command to the source host to export an OVF
+    #    appliance file from the machine.
+    # 2) Copy the source directory to the target direcotry. This is
+    #   the vagrant working direcotry and has the OVF, the
+    #   Vagrantfile, and possibly other host specific files.
+    # 3) Import the OVM to create new VM on the target.
+    # 4) Remove the OVF file from the source.
+    # 5) Set add a '.vagrant' DB to set up the newly created VM as a
+    #    vagrant box.
+
+    local OVF_FILE="`date -u +'%Y-%m-%d-%H%M-%S'`-`uuidgen`-vm-snapshot.ovf"
+    echo -e "OVF_FILE : $OVF_FILE"
+
+    # 1) Use ssh to issue command to the source host to export an OVF
+    #    appliance file from the machine.
+    echo -e $FROM_CMD_PREFIX eval "cd $FROM_PATH; mkdir $TFER_DIR; VBoxManage $SOURCE_ID --option manifest,nomacs --output=${TFER_DIRs}/${OVF_FILE}"
+    $FROM_CMD_PREFIX eval "cd $FROM_PATH; mkdir $TFER_DIR; VBoxManage $SOURCE_ID --option manifest,nomacs --output=${TFER_DIRs}/${OVF_FILE}"
+    
+    # 2) Copy the source directory to the target direcotry.
+    # echo -e scp -r "${FROM_CMD_PREFIX}${FROM_PATH} ${TO_CMD_PREFIX}${TO_PATH}"
+    # scp -r "${FROM_CMD_PREFIX}${FROM_PATH} ${TO_CMD_PREFIX}${TO_PATH}"
+
+    # 3) Import the OVM to create new VM on the target.
+    # echo -e $TO_CMD_PREFIX eval "cd $TO_PATH; VBoxManage import ${TFER_DIR}/${OVF_FILE}"
+    # $TO_CMD_PREFIX eval "cd $TO_PATH; VBoxManage import ${TFER_DIR}/${OVF_FILE}"
+
+    # 4) Remove the OVF file from the source.
+    # echo -e $FROM_CMD_PREFIX eval "rm ${FROM_PATH}/${TFER_DIR}/${OVF_FILE}; rmdir ${FROM_PATH}/${TFER_DIR}"
+    # $FROM_CMD_PREFIX eval "rm ${FROM_PATH}/${TFER_DIR}/${OVF_FILE}; rmdir ${FROM_PATH}/${TFER_DIR}"
+
+    # 5) Set add a '.vagrant' DB to set up the newly created VM as a
+    #    vagrant box.
+    # echo -e $TO_CMD_PREFIX eval "mkdir .vagrant/machines/default/virtualbox; echo $NEW_HOST_ID > .vagrant/machines/default/virtualbox/id"
+    # $TO_CMD_PREFIX eval "mkdir .vagrant/machines/default/virtualbox; echo $NEW_HOST_ID > .vagrant/machines/default/virtualbox/id"
+}
+
+case "$RESOURCE" in
+    'environments')
+	case "$ACTION" in
+	    'create')
+		environments_create();;
+	    *)
+		echo "Unknown action '$ACTION'." >&2;;
+	esac;;
+    *)
+	echo "Uknown resource '$RESOURCE'." >&2;;
+esac
