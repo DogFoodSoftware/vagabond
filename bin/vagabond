@@ -177,16 +177,16 @@ switch ($RESOURCE) {
 # Dispatch functions.
 
 function hosts_create() {
-  global $STDERR;
+  global $STDERR, $PARAMETERS;
 
   $FROM = $PARAMETERS['from'];
   $TO = $PARAMETERS['to'];
   if (!isset($FROM)) {
-    fwrite($STDERR, "Must specify 'from' parameter.");
+    fwrite($STDERR, "Must specify 'from' parameter.\n");
     exit(1);
   }
   if (!isset($TO)) {
-    fwrite($STDERR, "Must specify 'to' parameter.");
+    fwrite($STDERR, "Must specify 'to' parameter.\n");
     exit(1);
   }
   exit();
