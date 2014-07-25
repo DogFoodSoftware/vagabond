@@ -195,11 +195,13 @@ function hosts_create() {
 
   # Okay, let's test $FROM and $TO. Each must be either an SSH URL or a local path.    
   if (substr($FROM, 0, 6) == "ssh://") {
-    $from_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($FROM, 6, strpos($FROM, "/", 7) - 6);
+    $from_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($FROM, 6, strpos($FROM, "/", 7) - 6).' "';
+    $from_cmd_postfix = '"';
     $from_path = substr($FROM, strpos($FROM, "/", 6));
   }
   else if (is_dir($FROM)) {
     $from_cmd_prefix = "";
+    $from_cmd_postfix = "";
     $from_path = "$FROM";
   }
   else {
@@ -208,11 +210,13 @@ function hosts_create() {
   }
 
   if (substr($TO, 0, 6) == "ssh://") {
-    $to_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($TO, 6, strpos($TO, "/", 7) - 6);
+    $to_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($TO, 6, strpos($TO, "/", 7) - 6).' "';
+    $to_cmd_postfix = '"';
     $to_path = substr($TO, strpos($TO, "/", 6));
   }
   else if (is_dir(dirname($TO))) {
     $to_cmd_prefix = "";
+    $to_cmd_postfix = "";
     $to_path = "$TO";
   }
   else {
@@ -224,32 +228,31 @@ function hosts_create() {
   print "FROM : $FROM\nfrom_cmd_prefix : $from_cmd_prefix\nfrom_path : $from_path\nTO : $TO\nto_cmd_prefix : $to_cmd_prefix\nto_path : $to_path";
 
   # Verify we can connect to any non-local sources.
-  if ($from_cmd_prefix != "" && system("$from_cmd_prefix echo") === FALSE) {
+  if ($from_cmd_prefix != "" && system("$from_cmd_prefix echo $from_cmd_postfix") === FALSE) {
     fwrite($STDERR, "Could establish SSH connection to source ($from_cmd_prefix); setup key-based authentication.\n");
     exit(1);
   }
-  if ($to_cmd_prefix != "" && system("$to_cmd_prefix echo") === FALSE) {
+  if ($to_cmd_prefix != "" && system("$to_cmd_prefix echo $from_cmd_postfix") === FALSE) {
     fwrite($STDERR, "Could establish SSH connection to target ($to_cmd_prefix); setup key-based authentication.\n");
     exit(1);
   }
 
   # Verify $from_path is valid export target.
-  print "$from_cmd_prefix test -e $from_path\n";
-  if (system("$from_cmd_prefix test -e $from_path") !== FALSE) {
+  if (system("$from_cmd_prefix eval 'if [ -e $from_path ]; then echo TRUE; fi' $from_cmd_postfix") != 'TRUE') {
     fwrite($STDERR, "No source directory found at '$FROM'.\n");
     exit(1);
   }
-  else if (system("$from_cmd_prefix test -f $from_path/Vagrantfile") !== FALSE) {
+  else if (system("$from_cmd_prefix eval 'if [ -f $from_path/Vagrantfile ]; then echo TRUE; fi' $from_cmd_postfix") != 'TRUE') {
     fwrite($STDERR, "No source 'Vagrantfile' found at '$FROM/Vagrantfile'.\n");
     exit(1);
   }
-  else if (system("$from_cmd_prefix test -d $from_path/.vagrant/machines/default/virtualbox/id") !== FALSE) {
+  else if (system("$from_cmd_prefix eval 'if [ -f $from_path/.vagrant/machines/default/virtualbox/id ]; then echo TRUE; fi' $from_cmd_postfix") != 'TRUE') {
     fwrite($STDERR, "No VirtualBox ID found (in '$FROM/.vagrant).\n");
     exit(1);
   }
 
   # Verify $to_path is free.
-  if (system("$to_cmd_prefix test -e $to_path") !== FALSE) {
+  if (system("$to_cmd_prefix eval 'if [ -e $to_path ]; then echo TRUE; fi' $to_cmd_postfix") == 'TRUE') {
     fwrite($STDERR, "File or directory blocks target location '$TO'.\n");
     exit(1);
   }
@@ -257,13 +260,13 @@ function hosts_create() {
 
   # Finally, check to see that the source VM is not currently running.
   # TODO: Before going production, we need to do a file lock or something. We want exports to queue up with each other and backups. And later, to allow for configurable concurrent defaulting to per-physical host or something.
-  $source_id = system("$from_cmd_prefix eval 'cd $from_path; cat .vagrant/machines/default/virtualbox/id'");
+  $source_id = system("$from_cmd_prefix eval 'cd $from_path; cat .vagrant/machines/default/virtualbox/id' $from_cmd_postfix");
   if ($source_id === FALSE) {
     fwrite($STDERR, "Could not retrieve source VM ID.\n");
     exit(1);
   }
 
-  $from_state = system("$from_cmd_prefix eval '$from_cmd_prefix VBoxManage showvminfo $source_id | grep State:'");
+  $from_state = system("$from_cmd_prefix eval 'VBoxManage showvminfo $source_id | grep State:' $from_cmd_postfix");
   if (!preg_match("/powered off/", $from_state)) {
     fwrite($STDERR, "VM at '$FROM' is not shut down. Got:\n\t$from_state\n");
     exit(1);
@@ -292,7 +295,7 @@ function hosts_create() {
 
   # 1) Use ssh to issue command to the source host to export an OVF
   #    appliance file from the machine.
-  $export_cmd = "$from_cmd_prefix eval 'cd $from_path; mkdir $TFER_DIR; VBoxManage $source_id --option manifest,nomacs --output=${TFER_DIRs}/${ovf_file}'";
+  $export_cmd = "$from_cmd_prefix eval 'cd $from_path; mkdir $TFER_DIR; VBoxManage $source_id --option manifest,nomacs --output=${TFER_DIR}/${ovf_file}' $from_cmd_postfix";
   print "$export_cmd\n";
   if (system($export_cmd) === FALSE) {
     fwrite($STDERR, "Export command failed; bailing out. Command:\n\t$export_cmd\n");
