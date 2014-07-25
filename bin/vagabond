@@ -189,35 +189,34 @@ function hosts_create() {
     fwrite($STDERR, "Must specify 'to' parameter.\n");
     exit(1);
   }
-  exit();
 
   # Set up local DB prefix.
   $TFER_DIR="_tfer_dir";
 
   # Okay, let's test $FROM and $TO. Each must be either an SSH URL or a local path.    
   if (substr($FROM, 0, 6) == "ssh://") {
-    $from_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey ".substr($FROM, 6, strpos($FROM, ":"));
-    $from_path = substr($FROM, strpos($FROM, ":") + 1);
+    $from_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($FROM, 6, strpos($FROM, "/", 7) - 6);
+    $from_path = substr($FROM, strpos($FROM, "/", 6));
   }
   else if (is_dir($FROM)) {
     $from_cmd_prefix = "";
     $from_path = "$FROM";
   }
   else {
-    fwrite($STDERR, "'from' parameter must be SSH URL ('ssh://...') or a local path.");
+    fwrite($STDERR, "'from' parameter must be SSH URL ('ssh://...') or a local path. ($FROM)\n");
     exit(1);
   }
 
   if (substr($TO, 0, 6) == "ssh://") {
-    $to_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey ".substr($TO, 6, strpos($TO, ":"));
-    $to_path = substr($TO, strpos($TO, ":") + 1);
+    $to_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($TO, 6, strpos($TO, "/", 7) - 6);
+    $to_path = substr($TO, strpos($TO, "/", 6));
   }
-  else if (is_dir($TO)) {
+  else if (is_dir(dirname($TO))) {
     $to_cmd_prefix = "";
     $to_path = "$TO";
   }
   else {
-    fwrite($STDERR, "'to' parameter must be SSH URL ('ssh://...') or a local path.");
+    fwrite($STDERR, "'to' parameter must be SSH URL ('ssh://...') or a local path specifying new directory in existing directory. ($TO)\n");
     exit(1);
   }
 
@@ -226,31 +225,32 @@ function hosts_create() {
 
   # Verify we can connect to any non-local sources.
   if ($from_cmd_prefix != "" && system("$from_cmd_prefix echo") === FALSE) {
-    fwrite($STDERR, "Could establish SSH connection to source ($from_cmd_prefix); setup key-based authentication.");
+    fwrite($STDERR, "Could establish SSH connection to source ($from_cmd_prefix); setup key-based authentication.\n");
     exit(1);
   }
   if ($to_cmd_prefix != "" && system("$to_cmd_prefix echo") === FALSE) {
-    fwrite($STDERR, "Could establish SSH connection to target ($to_cmd_prefix); setup key-based authentication.");
+    fwrite($STDERR, "Could establish SSH connection to target ($to_cmd_prefix); setup key-based authentication.\n");
     exit(1);
   }
 
   # Verify $from_path is valid export target.
+  print "$from_cmd_prefix test -e $from_path\n";
   if (system("$from_cmd_prefix test -e $from_path") !== FALSE) {
-    fwrite($STDERR, "No source directory found at '$FROM'.");
+    fwrite($STDERR, "No source directory found at '$FROM'.\n");
     exit(1);
   }
   else if (system("$from_cmd_prefix test -f $from_path/Vagrantfile") !== FALSE) {
-    fwrite($STDERR, "No source 'Vagrantfile' found at '$FROM/Vagrantfile'.");
+    fwrite($STDERR, "No source 'Vagrantfile' found at '$FROM/Vagrantfile'.\n");
     exit(1);
   }
   else if (system("$from_cmd_prefix test -d $from_path/.vagrant/machines/default/virtualbox/id") !== FALSE) {
-    fwrite($STDERR, "No VirtualBox ID found (in '$FROM/.vagrant).");
+    fwrite($STDERR, "No VirtualBox ID found (in '$FROM/.vagrant).\n");
     exit(1);
   }
 
   # Verify $to_path is free.
   if (system("$to_cmd_prefix test -e $to_path") !== FALSE) {
-    fwrite($STDERR, "File or directory blocks target location '$TO'.");
+    fwrite($STDERR, "File or directory blocks target location '$TO'.\n");
     exit(1);
   }
 
@@ -259,13 +259,13 @@ function hosts_create() {
   # TODO: Before going production, we need to do a file lock or something. We want exports to queue up with each other and backups. And later, to allow for configurable concurrent defaulting to per-physical host or something.
   $source_id = system("$from_cmd_prefix eval 'cd $from_path; cat .vagrant/machines/default/virtualbox/id'");
   if ($source_id === FALSE) {
-    fwrite($STDERR, "Could not retrieve source VM ID.");
+    fwrite($STDERR, "Could not retrieve source VM ID.\n");
     exit(1);
   }
 
   $from_state = system("$from_cmd_prefix eval '$from_cmd_prefix VBoxManage showvminfo $source_id | grep State:'");
   if (!preg_match("/powered off/", $from_state)) {
-    fwrite($STDERR, "VM at '$FROM' is not shut down. Got:\n\t$from_state");
+    fwrite($STDERR, "VM at '$FROM' is not shut down. Got:\n\t$from_state\n");
     exit(1);
   }
   print "source_id : $source_id\nfrom_state : $from_state\n";
@@ -295,7 +295,7 @@ function hosts_create() {
   $export_cmd = "$from_cmd_prefix eval 'cd $from_path; mkdir $TFER_DIR; VBoxManage $source_id --option manifest,nomacs --output=${TFER_DIRs}/${ovf_file}'";
   print "$export_cmd\n";
   if (system($export_cmd) === FALSE) {
-    fwrite($STDERR, "Export command failed; bailing out. Command:\n\t$export_cmd");
+    fwrite($STDERR, "Export command failed; bailing out. Command:\n\t$export_cmd\n");
     exit(1);
   }
     
