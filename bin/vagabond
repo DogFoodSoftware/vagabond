@@ -301,14 +301,24 @@ function hosts_create() {
   #    vagrant box.
   # 8) Cleanup local _tfer direcotry.
 
-  $ovf_base = system('date -u +%Y-%m-%d-%H%M-%S').'-'.system('uuidgen').'-vm-snapshot';
+  $ovf_date_cmd = 'date -u +%Y-%m-%d-%H%M-%S';
+  $ovf_base = system($ovf_date_cmd, $sys_ret);
+  if ($sys_ret != 0) {
+    fwrite($STDERR, "Could not generate 'ovb_base'. Failed command:\n\t$ovf_date_cmd");
+    exit(2);
+  }
+  $ovf_base .= '-'.system('uuidgen', $sys_ret).'-vm-snapshot';
+  if ($sys_ret != 0) {
+    fwrite($STDERR, "Could not generate 'ovb_base'. Failed command:\n\tuuidgen");
+    exit(2);
+  }
   $ovf_file = $ovf_base.'.ovf';
   print "ovf_file : $ovf_file\n";
 
   # 1) Export appliance OVF file from source.
   $export_cmd = "$from_cmd_prefix eval 'cd $from_path; mkdir $TFER_DIR; VBoxManage export $source_id --manifest --output=${TFER_DIR}/${ovf_file}' $from_cmd_postfix";
   print "$export_cmd\n";
-  if (system($export_cmd) === FALSE) {
+  if (system($export_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "Export command failed; bailing out. Command:\n\t$export_cmd\n");
      exit(1);
   }
@@ -316,7 +326,7 @@ function hosts_create() {
   # 2) Copy the source directory to the target direcotry.
   $scp_cmd = "scp -r ${from_scp_prefix}${from_path} ${to_scp_prefix}${to_path}";
   print $scp_cmd;
-  if (system($scp_cmd) === FALSE) {
+  if (system($scp_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "SCP failed; bailing out. Command:\n\t$scp_cmd\n");
     exit(1);
   }
@@ -324,7 +334,7 @@ function hosts_create() {
   # 3) Import the OVF to create new VM on the target.
   $import_cmd = "$to_cmd_prefix eval 'cd $to_path; VBoxManage import ${TFER_DIR}/${ovf_file}' $to_cmd_postfix";
   print "$import_cmd\n";
-  if (system($import_cmd) === FALSE) {
+  if (system($import_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "Import command failed; bailing out. Command\n\t$import_cmd\n");
     exit(1);
   }
@@ -343,30 +353,30 @@ function hosts_create() {
   $to_name = preg_replace("/_\d+$/", '_'.time(), $source_name);
   $rename_cmd = "$to_cmd_prefix eval 'VBoxManage modifyvm $to_id --name $to_name' $to_cmd_postfix";
   print "$rename_cmd\n";
-  if (system($rename_cmd) === FALSE) {
+  if (system($rename_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "WARNING: Could not rename VM to current timestamp. Suggest this be done manually. Command\n\t$rename_cmd\n");
   }
 
   # 6) Remove the OVF file from the source.
   $source_cleanup = "$from_cmd_prefix eval 'rm ${from_path}/${TFER_DIR}/${ovf_base}*; rmdir ${from_path}/${TFER_DIR}' $from_cmd_postfix";
   print "$source_cleanup\n";
-  if (system($source_cleanup) === FALSE) {
+  if (system($source_cleanup, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "WARNING: Source cleanup failed. Continuing, cleanup manually. Command\n\t$source_cleanup\n");
   }
 
   # 7) Set add a '.vagrant' DB to set up the newly created VM as a
   #    vagrant box.
-  $setup_vagrant_cmd = "$to_cmd_prefix eval 'cd $to_path; mkdir -p .vagrant/machines/default/virtualbox; echo $to_id > .vagrant/machines/default/virtualbox/id' $to_cmd_postfix";
+  $setup_vagrant_cmd = "$to_cmd_prefix eval 'set -e; cd $to_path; mkdir -p .vagrant/machines/default/virtualbox; echo $to_id > .vagrant/machines/default/virtualbox/id' $to_cmd_postfix";
   print "$setup_vagrant_cmd\n";
-  if (system($setup_vagrant_cmd) === FALSE) {
+  if (system($setup_vagrant_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "Could not setup vagrant id. Command:\n\t$setup_vagrant_cmd");
     exit(1);
   }
 
   # 8) Cleanup local _tfer direcotry.
-  $to_cleanup_cmd = "$to_cmd_prefix eval 'cd ${to_path}; rm ${ovf_base}*; rmdir $TFER_DIR' $to_cmd_postfix";
+  $to_cleanup_cmd = "$to_cmd_prefix eval 'set -e; cd ${to_path}; rm ${TFER_DIR}/${ovf_base}*; rmdir $TFER_DIR' $to_cmd_postfix";
   print "$to_cleanup_cmd\n";
-  if (system($to_cleanup_cmd) === FALSE) {
+  if (system($to_cleanup_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
     fwrite($STDERR, "WARNING: To cleanup failed; manually clean. Command:\n\t$to_cleanup_cmd\n");
   }
 }
