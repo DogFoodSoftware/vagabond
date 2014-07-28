@@ -1,5 +1,5 @@
-#!/bin/bash
-
+#!/usr/bin/env php
+<?php
 # /**
 # * <div id="Overview"class="blurbSummary grid_12">
 # * <div class="p">
@@ -126,4 +126,260 @@
 # self-scaling HTTP front end processing. Each vagabond-box is a minimal
 # vagabond-envioronment
 
-vagabond snapshot PUT auto-id source=/vagabond-environment/jmfa-fraudmanager
+$STDERR = fopen('php://stderr', 'w+');
+
+# Process parameters. Recall that '$argv[0]' is the script name.
+
+if (count($argv) < 3) {
+  frwite($STDERR, "Must provide at least resource and verb.");
+}
+
+array_shift($argv); # No need for the script name.
+$RESOURCE = array_shift($argv);
+$VERB = array_shift($argv);
+
+$ID = null;
+$PARAMETERS = array();
+
+$first_chunk = true;
+while (count($argv) > 0) {
+  $chunk = array_shift($argv);
+
+  $matches = array();
+  if (!preg_match("/^(\w+)=(.+)$/", $chunk, $matches) && $first_chunk) {
+    $ID = $chunk;
+  }
+  else {
+    $PARAMETERS[$matches[1]] = $matches[2];
+  }
+
+  $first_chunk = false;
+}
+
+print "RESOURCE : $RESOURCE\nVERB : $VERB\nID : $ID\nPARAMETERS : ";
+var_dump($PARAMETERS);
+
+# Dispatch request based on $RESOURCE + $VERB.
+
+switch ($RESOURCE) {
+ case 'hosts':
+   switch ($VERB) {
+     case 'create':
+       hosts_create(); break;
+     default:
+       fwrite($STDERR, "Unknown action '$ACTION'."); break;
+   }
+   break;
+ default:
+   fwrite($STDERR, "Unknown resource '$RESOURCE'."); break;
+ }
+
+# Dispatch functions.
+
+function hosts_create() {
+  global $STDERR, $PARAMETERS;
+
+  $FROM = $PARAMETERS['from'];
+  $TO = $PARAMETERS['to'];
+  if (!isset($FROM)) {
+    fwrite($STDERR, "Must specify 'from' parameter.\n");
+    exit(1);
+  }
+  if (!isset($TO)) {
+    fwrite($STDERR, "Must specify 'to' parameter.\n");
+    exit(1);
+  }
+
+  # Set up local DB prefix.
+  $TFER_DIR="_tfer_dir";
+
+  # Okay, let's test $FROM and $TO. Each must be either an SSH URL or a local path.    
+  if (substr($FROM, 0, 6) == "ssh://") {
+    $from_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($FROM, 6, strpos($FROM, "/", 7) - 6).' "';
+    $from_cmd_postfix = '"';
+    $from_scp_prefix = substr($FROM, 6, strpos($FROM, "/", 7) - 6).':';
+    $from_path = substr($FROM, strpos($FROM, "/", 6));
+  }
+  else if (is_dir($FROM)) {
+    $from_cmd_prefix = "";
+    $from_cmd_postfix = "";
+    $from_scp_prefix = "";
+    $from_path = "$FROM";
+  }
+  else {
+    fwrite($STDERR, "'from' parameter must be SSH URL ('ssh://...') or a local path. ($FROM)\n");
+    exit(1);
+  }
+
+  if (substr($TO, 0, 6) == "ssh://") {
+    $to_cmd_prefix = "ssh -o 'PreferredAuthentications=publickey' ".substr($TO, 6, strpos($TO, "/", 7) - 6).' "';
+    $to_cmd_postfix = '"';
+    $to_scp_prefix = substr($TO, 6, strpos($TO, "/", 7) - 6).':';
+    $to_path = substr($TO, strpos($TO, "/", 6));
+  }
+  else if (is_dir(dirname($TO))) {
+    $to_cmd_prefix = "";
+    $to_cmd_postfix = "";
+    $to_scp_prefix = "";
+    $to_path = "$TO";
+  }
+  else {
+    fwrite($STDERR, "'to' parameter must be SSH URL ('ssh://...') or a local path specifying new directory in existing directory. ($TO)\n");
+    exit(1);
+  }
+
+  # TODO: Use standard lib and turn all these 'verbos echos into vechos (I think).
+  print "FROM : $FROM\nfrom_cmd_prefix : $from_cmd_prefix\nfrom_path : $from_path\nTO : $TO\nto_cmd_prefix : $to_cmd_prefix\nto_path : $to_path";
+
+  # Verify we can connect to any non-local sources.
+  print "\n\n$from_cmd_prefix eval 'echo CONNECTED' $from_cmd_postfix\n\n";
+  if ($from_cmd_prefix != "" && system("$from_cmd_prefix eval 'echo CONNECTED' $from_cmd_postfix") != 'CONNECTED') {
+    fwrite($STDERR, "Could establish SSH connection to source ($from_cmd_prefix); setup key-based authentication.\n");
+    exit(1);
+  }
+  if ($to_cmd_prefix != "" && system("$to_cmd_prefix eval 'echo CONNECTED' $to_cmd_postfix") != 'CONNECTED') {
+    fwrite($STDERR, "Could establish SSH connection to target ($to_cmd_prefix); setup key-based authentication.\n");
+    exit(1);
+  }
+
+  # Verify $from_path is valid export target.
+  if (system("$from_cmd_prefix eval 'if [ -e $from_path ]; then echo TRUE; fi' $from_cmd_postfix") != 'TRUE') {
+    fwrite($STDERR, "No source directory found at '$FROM'.\n");
+    exit(1);
+  }
+  else if (system("$from_cmd_prefix eval 'if [ -f $from_path/Vagrantfile ]; then echo TRUE; fi' $from_cmd_postfix") != 'TRUE') {
+    fwrite($STDERR, "No source 'Vagrantfile' found at '$FROM/Vagrantfile'.\n");
+    exit(1);
+  }
+  else if (system("$from_cmd_prefix eval 'if [ -f $from_path/.vagrant/machines/default/virtualbox/id ]; then echo TRUE; fi' $from_cmd_postfix") != 'TRUE') {
+    fwrite($STDERR, "No VirtualBox ID found (in '$FROM/.vagrant).\n");
+    exit(1);
+  }
+
+  # Verify $to_path is free.
+  if (system("$to_cmd_prefix eval 'if [ -e $to_path ]; then echo TRUE; fi' $to_cmd_postfix") == 'TRUE') {
+    fwrite($STDERR, "File or directory blocks target location '$TO'.\n");
+    exit(1);
+  }
+
+
+  # Finally, check to see that the source VM is not currently running.
+  # TODO: Before going production, we need to do a file lock or something. We want exports to queue up with each other and backups. And later, to allow for configurable concurrent defaulting to per-physical host or something.
+  $source_id = system("$from_cmd_prefix eval 'cd $from_path; cat .vagrant/machines/default/virtualbox/id' $from_cmd_postfix");
+  if ($source_id === FALSE || $source_id == "") {
+    fwrite($STDERR, "Could not retrieve source VM ID.\n");
+    exit(1);
+  }
+  $source_name_cmd = "$from_cmd_prefix eval 'VBoxManage showvminfo $source_id | grep Name:' $from_cmd_postfix | awk '{print \$2}'";
+  print "$source_name_cmd\n";
+  $source_name = system($source_name_cmd);
+  if ($source_name === FALSE || $source_name == "") {
+    fwrite($STDERR, "Could not retrieve source VM name.\n");
+    exit(1);
+  }
+  print $source_name;
+
+  $from_state = system("$from_cmd_prefix eval 'VBoxManage showvminfo $source_id | grep State:' $from_cmd_postfix");
+  if (!preg_match("/powered off/", $from_state)) {
+    fwrite($STDERR, "VM at '$FROM' is not shut down. Got:\n\t$from_state\n");
+    exit(1);
+  }
+  print "source_id : $source_id\nfrom_state : $from_state\n";
+  print "from_scp_prefix : $from_scp_prefix\nto_scp_prefix : $to_scp_prefix\n";
+
+  # Okay, everything checks out for transfer.
+
+  # 1) Export appliance OVF file from source.
+  # 2) Copy the source directory to the target direcotry. This is
+  #   the vagrant working direcotry and has the OVF, the
+  #   Vagrantfile, and possibly other host specific files.
+  # 3) Import the OVF to create new VM on the target.
+  # 4) Extract the newly imported ID.
+  # 5) Rename the imported VM.
+  # 6) Remove the OVF file from the source.
+  # 7) Set add a '.vagrant' DB to set up the newly created VM as a
+  #    vagrant box.
+  # 8) Cleanup local _tfer direcotry.
+
+  $ovf_date_cmd = 'date -u +%Y-%m-%d-%H%M-%S';
+  $ovf_base = system($ovf_date_cmd, $sys_ret);
+  if ($sys_ret != 0) {
+    fwrite($STDERR, "Could not generate 'ovb_base'. Failed command:\n\t$ovf_date_cmd");
+    exit(2);
+  }
+  $ovf_base .= '-'.system('uuidgen', $sys_ret).'-vm-snapshot';
+  if ($sys_ret != 0) {
+    fwrite($STDERR, "Could not generate 'ovb_base'. Failed command:\n\tuuidgen");
+    exit(2);
+  }
+  $ovf_file = $ovf_base.'.ovf';
+  print "ovf_file : $ovf_file\n";
+
+  # 1) Export appliance OVF file from source.
+  $export_cmd = "$from_cmd_prefix eval 'cd $from_path; mkdir $TFER_DIR; VBoxManage export $source_id --manifest --output=${TFER_DIR}/${ovf_file}' $from_cmd_postfix";
+  print "$export_cmd\n";
+  if (system($export_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "Export command failed; bailing out. Command:\n\t$export_cmd\n");
+     exit(1);
+  }
+    
+  # 2) Copy the source directory to the target direcotry.
+  $scp_cmd = "scp -r ${from_scp_prefix}${from_path} ${to_scp_prefix}${to_path}";
+  print $scp_cmd;
+  if (system($scp_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "SCP failed; bailing out. Command:\n\t$scp_cmd\n");
+    exit(1);
+  }
+
+  # 3) Import the OVF to create new VM on the target.
+  $import_cmd = "$to_cmd_prefix eval 'cd $to_path; VBoxManage import ${TFER_DIR}/${ovf_file}' $to_cmd_postfix";
+  print "$import_cmd\n";
+  if (system($import_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "Import command failed; bailing out. Command\n\t$import_cmd\n");
+    exit(1);
+  }
+
+  # 4) Extract the newly imported ID.
+  $to_id_cmd = "$to_cmd_prefix eval 'VBoxManage showvminfo $source_name' $to_cmd_postfix | grep 'Hardware UUID' | awk '{ print $3 }'";
+  print "$to_id_cmd\n";
+  $to_id = system($to_id_cmd);
+  if ($to_id === FALSE) {
+    fwrite($STDERR, "Could not extract local ID; bailing out. Command\n\t$to_id_cmd\n");
+    exit(1);
+  }
+  print "to_id : $to_id\n";
+
+  # 5) Rename the imported VM.
+  $to_name = preg_replace("/_\d+$/", '_'.time(), $source_name);
+  $rename_cmd = "$to_cmd_prefix eval 'VBoxManage modifyvm $to_id --name $to_name' $to_cmd_postfix";
+  print "$rename_cmd\n";
+  if (system($rename_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "WARNING: Could not rename VM to current timestamp. Suggest this be done manually. Command\n\t$rename_cmd\n");
+  }
+
+  # 6) Remove the OVF file from the source.
+  $source_cleanup = "$from_cmd_prefix eval 'rm ${from_path}/${TFER_DIR}/${ovf_base}*; rmdir ${from_path}/${TFER_DIR}' $from_cmd_postfix";
+  print "$source_cleanup\n";
+  if (system($source_cleanup, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "WARNING: Source cleanup failed. Continuing, cleanup manually. Command\n\t$source_cleanup\n");
+  }
+
+  # 7) Set add a '.vagrant' DB to set up the newly created VM as a
+  #    vagrant box.
+  $setup_vagrant_cmd = "$to_cmd_prefix eval 'set -e; cd $to_path; mkdir -p .vagrant/machines/default/virtualbox; echo $to_id > .vagrant/machines/default/virtualbox/id' $to_cmd_postfix";
+  print "$setup_vagrant_cmd\n";
+  if (system($setup_vagrant_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "Could not setup vagrant id. Command:\n\t$setup_vagrant_cmd");
+    exit(1);
+  }
+
+  # 8) Cleanup local _tfer direcotry.
+  $to_cleanup_cmd = "$to_cmd_prefix eval 'set -e; cd ${to_path}; rm ${TFER_DIR}/${ovf_base}*; rmdir $TFER_DIR' $to_cmd_postfix";
+  print "$to_cleanup_cmd\n";
+  if (system($to_cleanup_cmd, $sys_ret) === FALSE || $sys_ret != 0) {
+    fwrite($STDERR, "WARNING: To cleanup failed; manually clean. Command:\n\t$to_cleanup_cmd\n");
+  }
+}
+
+exit();
+?>
