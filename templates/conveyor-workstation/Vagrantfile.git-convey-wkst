@@ -3,11 +3,8 @@
 # /**
 #  * <div id="Overview" class="blurbSummary grid_12">
 #  * <div class="p">
-#  *   Sets up a Vagrant VM as a minimal Conveyor workstation with just the core
-#  *   Conveyor projects. Developers can manually add their own and import
-#  *   existing projects to customize the VM and VM maintainers may use this
-#  *   configuration as a starting point for automatic configuration of more
-#  *   specialized workstations.
+#  *   Sets up a Vagrant VM as a minimal Conveyor workstation with git-convey
+#  *   project checked out.
 #  * </div>
 #  * </div><!-- #Overview.blurbSummary -->
 #  * <div id="Implementation" class="blurbSummary grid_12">
@@ -25,15 +22,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION_2) do |config|
   config.vm.box = "opensuse-13.1-64bit-20GB-server"
   config.vm.box_url = "http://dogfoodsoftware.com/bitbucket/opensuse-13.1-64bit-20GB-server.box"
 
-  config.vm.hostname = 'dfs-workstation'
+  config.vm.hostname = 'git-convey-wkst'
 
   # For development: expose the HTTP port on the host.
   config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: true
   config.vm.network :forwarded_port, guest: 8443, host: 8443, auto_correct: true
 
   config.vm.provider :virtualbox do |vb|
-    # Override default 1GB memory for the base box.
-    vb.customize ["modifyvm", :id, "--memory", "3072"]
+    # If you'd like more memory, override default 1GB memory for the base box.
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
   end
 
   # Configure SSH.
@@ -51,13 +48,22 @@ SCRIPT
 # TODO: Update to latest installed file after production release. DFS site
 # should always be running of the latest release, so grab their copy.
 wget https://raw.github.com/DogFoodSoftware/conveyor-core/master/install
-# TODO: Check MD5 sum...
 sudo -u user bash install 2>&1 | tee conveyor-install-log
 rm install
 SCRIPT
   config.vm.provision "shell", :inline => $SETUP_MINIMAL_CONVEYOR
 
+  $INSTALL_CONVEYOR_PROJECTS = <<SCRIPT
+sudo -u user /home/user/playground/dogfoodsoftware.com/conveyor/core/bin/conveyor-project-install https://github.com/DogFoodSoftware/git-convey.git
+SCRIPT
+  config.vm.provision "shell", :inline => $INSTALL_CONVEYOR_PROJECTS
+
 end # close anonymous config block
+
+if ! File.exists?("#{OUR_DIR}/project-console")
+  system "curl https://raw.github.com/DogFoodSoftware/git-convey/master/vagabond/project-console > #{OUR_DIR}/project-console"
+  system "chmod a+x #{OUR_DIR}/project-console"
+end
 
 # /**
 #  * <div class="subHeader"><span><code>setup_keys()</code></span></div>
