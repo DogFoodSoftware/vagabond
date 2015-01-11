@@ -1,5 +1,0 @@
-You're a micromanager if you ever:
-
-- Try to re-order activities on anything less than a day-by-day
-  basis. "If finishing the new feature is going to take 90 minutes,
-  could you fix the build first?" Yes." But it doesn't matter.
